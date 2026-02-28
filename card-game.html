@@ -10,12 +10,15 @@
   :root {
     --bg: #1a1410;
     --surface: #242018;
+    --surface2: #2e2820;
     --card-bg: #f5f0e8;
     --card-border: #c8b89a;
     --ink: #2c2416;
     --gold: #c9a84c;
     --gold-light: #e8d08a;
     --muted: #6b5d4a;
+    --green: #7ed4a0;
+    --red: #e07070;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,23 +47,10 @@
     margin-bottom: 4px;
   }
 
-  .subtitle {
-    font-style: italic;
-    color: var(--muted);
-    font-size: 1rem;
-    margin-bottom: 32px;
-    text-align: center;
-  }
+  .subtitle { font-style: italic; color: var(--muted); font-size: 1rem; margin-bottom: 24px; text-align: center; }
 
-  /* ── SHARED SCREEN UTILS ──────────────────────────────────────────────── */
-  .screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    width: 100%;
-  }
-
+  /* ── SCREENS ──────────────────────────────────────────────────────────── */
+  .screen { display: none; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
   .screen.active { display: flex; }
 
   .panel {
@@ -82,12 +72,7 @@
 
   .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 
-  .field label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
+  .field label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 
   input[type="text"], input[type="password"] {
     background: rgba(255,255,255,0.05);
@@ -141,306 +126,205 @@
 
   .btn-secondary:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
 
-  .btn-text {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: 'Crimson Text', serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    padding: 4px;
-    transition: color 0.2s;
-  }
-
-  .btn-text:hover { color: var(--gold-light); }
-
   .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 16px 0;
-    color: var(--muted);
-    font-size: 0.85rem;
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0; color: var(--muted); font-size: 0.85rem;
   }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(201,168,76,0.15); }
 
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(201,168,76,0.15);
-  }
+  .error-msg { color: var(--red); font-size: 0.88rem; font-style: italic; text-align: center; min-height: 1.1em; margin-top: 6px; }
+  .success-msg { color: var(--green); font-size: 0.88rem; font-style: italic; text-align: center; min-height: 1.1em; margin-top: 6px; }
 
-  .error-msg {
-    color: #e07070;
-    font-size: 0.88rem;
-    font-style: italic;
-    text-align: center;
-    min-height: 1.1em;
-    margin-top: 6px;
-  }
-
-  .success-msg {
-    color: #7ed4a0;
-    font-size: 0.88rem;
-    font-style: italic;
-    text-align: center;
-    min-height: 1.1em;
-    margin-top: 6px;
-  }
-
-  /* ── SPINNER ──────────────────────────────────────────────────────────── */
   .spinner {
-    width: 36px;
-    height: 36px;
+    width: 36px; height: 36px;
     border: 3px solid rgba(201,168,76,0.2);
     border-top-color: var(--gold);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin: 20px auto;
   }
-
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .loading-text { color: var(--muted); font-style: italic; text-align: center; }
 
-  /* ── USER BAR — shown at top when logged in ───────────────────────────── */
+  /* ── USER BAR ─────────────────────────────────────────────────────────── */
   #user-bar {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 900px;
-    background: var(--surface);
-    border: 1px solid rgba(201,168,76,0.15);
-    border-radius: 8px;
-    padding: 8px 16px;
-    margin-bottom: 8px;
-    font-size: 0.88rem;
+    display: none; align-items: center; justify-content: space-between;
+    width: 100%; max-width: 700px;
+    background: var(--surface); border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 8px; padding: 8px 16px; margin-bottom: 8px; font-size: 0.88rem;
   }
-
   #user-bar.visible { display: flex; }
-
-  .user-bar-name {
-    color: var(--gold-light);
-    font-family: 'Playfair Display', serif;
-  }
-
-  .user-bar-tag {
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin-left: 6px;
-  }
-
+  .user-bar-name { color: var(--gold-light); font-family: 'Playfair Display', serif; }
+  .user-bar-tag { color: var(--muted); font-size: 0.8rem; margin-left: 6px; }
   .btn-signout {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: 'Crimson Text', serif;
-    font-size: 0.85rem;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    padding: 2px 4px;
+    background: none; border: none; color: var(--muted);
+    font-family: 'Crimson Text', serif; font-size: 0.85rem;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 2px; padding: 2px 4px;
     transition: color 0.2s;
   }
+  .btn-signout:hover { color: var(--red); }
 
-  .btn-signout:hover { color: #e07070; }
-
-  /* ── SETUP SCREEN ─────────────────────────────────────────────────────── */
-  .player-entry {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-    align-items: center;
-  }
-
-  .player-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+  /* ── LOBBY SETUP — host creates room ──────────────────────────────────── */
+  .player-entry { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .player-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
   .btn-add-player {
-    background: none;
-    border: 1px dashed rgba(201,168,76,0.3);
-    color: var(--muted);
-    font-family: 'Crimson Text', serif;
-    font-size: 0.95rem;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.2s;
-    margin-top: 4px;
+    background: none; border: 1px dashed rgba(201,168,76,0.3);
+    color: var(--muted); font-family: 'Crimson Text', serif;
+    font-size: 0.95rem; padding: 8px; border-radius: 6px;
+    cursor: pointer; width: 100%; transition: all 0.2s; margin-top: 4px;
   }
-
   .btn-add-player:hover { border-color: var(--gold); color: var(--gold-light); }
 
-  /* ── GAME SCREEN ──────────────────────────────────────────────────────── */
-  #game-screen { display: none; width: 100%; max-width: 900px; }
-
-  .game-layout {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 24px;
-    align-items: start;
-  }
-
-  @media (max-width: 680px) {
-    .game-layout { grid-template-columns: 1fr; }
-    .center-col { order: -1; }
-  }
-
-  .turn-banner {
+  /* ── WAITING ROOM — after host creates, before game starts ───────────── */
+  .join-code-display {
     text-align: center;
-    margin-bottom: 24px;
-    padding: 14px;
-    background: var(--surface);
-    border: 1px solid rgba(201,168,76,0.2);
+    background: var(--surface2);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .join-code-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+
+  .join-code-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+  }
+
+  .join-code-hint { font-size: 0.85rem; color: var(--muted); font-style: italic; margin-top: 6px; }
+
+  .waiting-players { margin: 16px 0; }
+
+  .waiting-player-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+
+  .waiting-player-row .slot-name { flex: 1; }
+  .slot-status { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+  .slot-status.joined { color: var(--green); }
+
+  /* ── JOIN SCREEN — non-host enters a code ─────────────────────────────── */
+  .join-code-input {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem !important;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* ── GAME SCREEN ──────────────────────────────────────────────────────── */
+  #game-screen { display: none; width: 100%; max-width: 700px; }
+
+  /* Turn banner */
+  .turn-banner {
+    text-align: center; margin-bottom: 20px; padding: 14px;
+    background: var(--surface); border: 1px solid rgba(201,168,76,0.2);
     border-radius: 10px;
   }
+  .turn-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+  .turn-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; transition: color 0.4s; }
+  .turn-sub { font-size: 0.85rem; color: var(--muted); font-style: italic; margin-top: 4px; }
 
-  .turn-label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+  /* Player roster — everyone, just names + card count */
+  .player-roster {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 20px; justify-content: center;
   }
 
-  .turn-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    font-weight: 700;
-    transition: color 0.4s;
+  .roster-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid rgba(201,168,76,0.12);
+    border-radius: 20px; padding: 5px 12px;
+    font-size: 0.85rem; transition: border-color 0.3s;
   }
 
-  .center-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+  .roster-chip.is-turn { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .roster-chip.is-me { border-color: rgba(201,168,76,0.3); }
+
+  .roster-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .roster-count { color: var(--muted); font-size: 0.78rem; margin-left: 2px; }
+
+  /* Center deck area */
+  .game-center {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    margin-bottom: 24px;
   }
 
   .deck-area {
-    position: relative;
-    width: 140px;
-    height: 200px;
-    cursor: pointer;
-    flex-shrink: 0;
+    position: relative; width: 140px; height: 200px;
+    cursor: pointer; flex-shrink: 0;
   }
 
-  .deck-shadow {
-    position: absolute;
-    width: 130px;
-    height: 190px;
-    background: rgba(0,0,0,0.4);
-    border-radius: 10px;
-    top: 6px;
-    left: 6px;
-  }
+  .deck-shadow { position: absolute; width: 130px; height: 190px; background: rgba(0,0,0,0.4); border-radius: 10px; top: 6px; left: 6px; }
 
   .deck-card {
-    position: absolute;
-    width: 130px;
-    height: 190px;
+    position: absolute; width: 130px; height: 190px;
     background: linear-gradient(135deg, #2a3a5c, #1e2d4a);
-    border: 2px solid rgba(201,168,76,0.4);
-    border-radius: 10px;
-    top: 0; left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border: 2px solid rgba(201,168,76,0.4); border-radius: 10px;
+    top: 0; left: 0; display: flex; align-items: center; justify-content: center;
     transition: transform 0.15s;
   }
 
-  .deck-area:hover .deck-card { transform: translateY(-4px); }
+  .deck-area:hover:not(.empty) .deck-card { transform: translateY(-4px); }
   .deck-area.empty .deck-card { opacity: 0.25; cursor: default; }
-  .deck-area.empty:hover .deck-card { transform: none; }
 
   .deck-pattern {
-    width: 90px;
-    height: 140px;
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 90px; height: 140px;
+    border: 1px solid rgba(201,168,76,0.3); border-radius: 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   }
 
-  .deck-count {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: var(--gold);
-    font-weight: 700;
-  }
+  .deck-count { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); font-weight: 700; }
+  .deck-label { font-size: 0.75rem; color: var(--muted); text-align: center; letter-spacing: 0.08em; text-transform: uppercase; }
 
-  .deck-label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-align: center;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  /* Not your turn overlay message */
+  .not-your-turn {
+    font-style: italic; color: var(--muted); font-size: 0.95rem;
+    text-align: center; padding: 8px;
   }
 
   .btn-draw {
     background: linear-gradient(135deg, #c9a84c, #a8853a);
-    color: #1a1410;
-    border: none;
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 10px 24px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
+    color: #1a1410; border: none;
+    font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700;
+    letter-spacing: 0.06em; padding: 12px 32px; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
   }
-
   .btn-draw:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,168,76,0.3); }
   .btn-draw:disabled { opacity: 0.35; cursor: default; transform: none; box-shadow: none; }
 
   .btn-reshuffle {
-    background: none;
-    border: 1px solid rgba(201,168,76,0.3);
-    color: var(--gold-light);
-    font-family: 'Crimson Text', serif;
-    font-size: 0.95rem;
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
+    background: none; border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold-light); font-family: 'Crimson Text', serif;
+    font-size: 0.95rem; padding: 8px 20px; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s;
   }
-
   .btn-reshuffle:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
 
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* Drawn card — only visible to the player who drew */
   .drawn-card-area {
-    min-height: 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
+    min-height: 60px; display: flex; flex-direction: column;
+    align-items: center; gap: 6px; width: 100%;
   }
 
   .drawn-card {
-    background: var(--card-bg);
-    color: var(--ink);
-    border-radius: 10px;
-    padding: 18px 20px;
-    width: 130px;
-    min-height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-family: 'Crimson Text', serif;
-    font-size: 1rem;
-    line-height: 1.4;
+    background: var(--card-bg); color: var(--ink);
+    border-radius: 10px; padding: 18px 20px;
+    width: 160px; min-height: 100px;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; font-family: 'Crimson Text', serif;
+    font-size: 1.05rem; line-height: 1.4;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     border: 1px solid var(--card-border);
     animation: cardFlip 0.35s ease-out;
@@ -448,177 +332,82 @@
   }
 
   .drawn-card::before {
-    content: '';
-    position: absolute;
-    inset: 5px;
-    border: 1px solid rgba(44,36,22,0.15);
-    border-radius: 6px;
-    pointer-events: none;
+    content: ''; position: absolute; inset: 5px;
+    border: 1px solid rgba(44,36,22,0.15); border-radius: 6px; pointer-events: none;
   }
 
   @keyframes cardFlip {
     from { transform: rotateY(90deg) scale(0.8); opacity: 0; }
-    to { transform: rotateY(0deg) scale(1); opacity: 1; }
+    to   { transform: rotateY(0deg)  scale(1);   opacity: 1; }
   }
 
-  .drawn-by { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+  .drawn-label { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
-  .player-panel {
+  /* MY HAND — the logged-in player's private cards */
+  .my-hand-section {
     background: var(--surface);
-    border: 1px solid rgba(201,168,76,0.15);
-    border-radius: 10px;
-    padding: 16px;
-    min-height: 200px;
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 10px; padding: 18px;
+    width: 100%;
   }
 
-  .player-panel h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(201,168,76,0.15);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .my-hand-section h3 {
+    font-family: 'Playfair Display', serif; font-size: 1rem;
+    color: var(--gold-light); margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 1px solid rgba(201,168,76,0.12);
+    display: flex; align-items: center; gap: 8px;
   }
 
-  .player-dot-lg { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .my-hand-dot { width: 10px; height: 10px; border-radius: 50%; }
 
   .hand-cards { display: flex; flex-direction: column; gap: 6px; }
 
   .hand-card {
     background: rgba(245,240,232,0.06);
     border: 1px solid rgba(200,184,154,0.15);
-    border-radius: 6px;
-    padding: 7px 10px;
-    font-size: 0.88rem;
-    color: rgba(245,240,232,0.75);
-    font-style: italic;
-    line-height: 1.3;
+    border-radius: 6px; padding: 8px 12px;
+    font-size: 0.92rem; color: rgba(245,240,232,0.8);
+    font-style: italic; line-height: 1.3;
   }
 
   .hand-empty { color: var(--muted); font-style: italic; font-size: 0.85rem; }
 
-  .all-players {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
-  }
-
-  .status-bar {
-    text-align: center;
-    color: var(--muted);
-    font-style: italic;
-    font-size: 0.9rem;
-    margin-top: 8px;
-    min-height: 1.2em;
-  }
-
+  /* Status bar */
+  .status-bar { text-align: center; color: var(--muted); font-style: italic; font-size: 0.9rem; min-height: 1.2em; }
   .highlight { color: var(--gold-light); }
-  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
   /* ── SYNC INDICATOR ───────────────────────────────────────────────────── */
   .sync-indicator {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    background: var(--surface);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 0.8rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
+    position: fixed; bottom: 16px; right: 16px;
+    background: var(--surface); border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px; padding: 8px 14px; font-size: 0.8rem; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
   }
-
   .sync-indicator.visible { opacity: 1; }
   .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
   .sync-dot.saving { animation: pulse 0.6s ease-in-out infinite alternate; }
-  .sync-dot.saved { background: #7ed4a0; }
-  .sync-dot.error { background: #e07070; }
+  .sync-dot.saved  { background: var(--green); }
+  .sync-dot.error  { background: var(--red); }
   @keyframes pulse { to { opacity: 0.3; } }
 
   /* ── CONFIRM OVERLAY ──────────────────────────────────────────────────── */
   .confirm-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(3px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; backdrop-filter: blur(3px);
   }
-
   .confirm-box {
-    background: var(--surface);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 12px;
-    padding: 32px;
-    text-align: center;
-    max-width: 320px;
-    width: 90%;
+    background: var(--surface); border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 12px; padding: 32px; text-align: center; max-width: 320px; width: 90%;
   }
-
-  .confirm-box h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    color: var(--gold-light);
-    margin-bottom: 10px;
-  }
-
-  .confirm-box p { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
+  .confirm-box h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold-light); margin-bottom: 10px; }
+  .confirm-box p  { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
   .confirm-btn-row { display: flex; gap: 12px; justify-content: center; }
-
-  .btn-danger {
-    background: #8b3a3a;
-    color: #f5e8e8;
-    border: none;
-    font-family: 'Crimson Text', serif;
-    font-size: 1rem;
-    padding: 10px 22px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
+  .btn-danger { background: #8b3a3a; color: #f5e8e8; border: none; font-family: 'Crimson Text', serif; font-size: 1rem; padding: 10px 22px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
   .btn-danger:hover { background: #a84444; }
-
-  .btn-ghost {
-    background: none;
-    border: 1px solid rgba(255,255,255,0.15);
-    color: var(--muted);
-    font-family: 'Crimson Text', serif;
-    font-size: 1rem;
-    padding: 10px 22px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
+  .btn-ghost  { background: none; border: 1px solid rgba(255,255,255,0.15); color: var(--muted); font-family: 'Crimson Text', serif; font-size: 1rem; padding: 10px 22px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
   .btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--card-bg); }
-
-  /* ── GUEST NOTICE ─────────────────────────────────────────────────────── */
-  .guest-notice {
-    background: rgba(201,168,76,0.06);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    text-align: center;
-    margin-bottom: 8px;
-    width: 100%;
-    max-width: 900px;
-  }
-
-  .guest-notice span { color: var(--gold-light); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -626,7 +415,7 @@
 <h1>The Deck</h1>
 <p class="subtitle">A game of drawing & doing</p>
 
-<!-- USER BAR — shown when logged in -->
+<!-- USER BAR -->
 <div id="user-bar">
   <div>
     <span class="user-bar-name" id="user-bar-name">—</span>
@@ -635,92 +424,66 @@
   <button class="btn-signout" onclick="signOut()">Sign out</button>
 </div>
 
-<!-- GUEST NOTICE — shown when playing as guest -->
-<div class="guest-notice" id="guest-notice" style="display:none">
-  Playing as guest — progress won't be saved between sessions.
-  <span onclick="showScreen('login-screen')">Sign in to save your games.</span>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     LOADING SCREEN
-════════════════════════════════════════════════════════════════════════ -->
+<!-- ═══ LOADING ═══ -->
 <div class="screen active" id="loading-screen" style="margin-top:60px">
   <div class="spinner"></div>
   <p class="loading-text">Loading…</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     LOGIN SCREEN
-     Username + password. Auto-registers if username is new.
-════════════════════════════════════════════════════════════════════════ -->
+<!-- ═══ LOGIN ═══ -->
 <div class="screen" id="login-screen">
   <div class="panel">
     <h2>Welcome Back</h2>
-
     <div class="field">
       <label>Username</label>
       <input type="text" id="login-username" placeholder="your username" autocomplete="username" autocapitalize="none">
     </div>
-
     <div class="field">
       <label>Password</label>
       <input type="password" id="login-password" placeholder="your password" autocomplete="current-password">
     </div>
-
     <p class="error-msg" id="login-error"></p>
-
     <button class="btn-primary" id="btn-login" onclick="handleLogin()">Sign In</button>
-
     <div class="divider">or</div>
-
     <button class="btn-secondary" onclick="showScreen('register-screen')">Create an Account</button>
-    <button class="btn-secondary" onclick="playAsGuest()" style="margin-top:8px">Play as Guest</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     REGISTER SCREEN
-════════════════════════════════════════════════════════════════════════ -->
+<!-- ═══ REGISTER ═══ -->
 <div class="screen" id="register-screen">
   <div class="panel">
     <h2>Create Account</h2>
-
     <div class="field">
       <label>Choose a Username</label>
       <input type="text" id="reg-username" placeholder="pick a name" autocomplete="username" autocapitalize="none">
     </div>
-
     <div class="field">
       <label>Password</label>
       <input type="password" id="reg-password" placeholder="at least 6 characters" autocomplete="new-password">
     </div>
-
     <div class="field">
       <label>Confirm Password</label>
       <input type="password" id="reg-confirm" placeholder="repeat password" autocomplete="new-password">
     </div>
-
     <p class="error-msg" id="reg-error"></p>
     <p class="success-msg" id="reg-success"></p>
-
     <button class="btn-primary" id="btn-register" onclick="handleRegister()">Create Account</button>
-
     <div class="divider">already have one?</div>
-
     <button class="btn-secondary" onclick="showScreen('login-screen')">Sign In Instead</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     SETUP SCREEN — who's playing this game?
-════════════════════════════════════════════════════════════════════════ -->
-<div class="screen" id="setup-screen">
+<!-- ═══ LOBBY — host sets up the room ═══ -->
+<div class="screen" id="lobby-screen">
   <div class="panel">
-    <h2>Who's Playing?</h2>
+    <h2>New Game</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px;text-align:center;font-style:italic">
+      Enter player names in turn order. Each player will claim their slot when they join.
+    </p>
     <div id="player-list">
       <div class="player-entry">
         <div class="player-dot" style="background:#7eb8d4"></div>
-        <input type="text" placeholder="Player 1 name">
+        <input type="text" placeholder="Player 1 name (you)">
       </div>
       <div class="player-entry">
         <div class="player-dot" style="background:#d47e7e"></div>
@@ -728,59 +491,113 @@
       </div>
     </div>
     <button class="btn-add-player" id="btn-add-player" onclick="addPlayer()">+ Add another player</button>
+    <p class="error-msg" id="lobby-error"></p>
+    <button class="btn-primary" style="margin-top:16px" onclick="createGame()">Create Room</button>
   </div>
-  <p class="error-msg" id="setup-error"></p>
-  <button class="btn-primary" style="max-width:420px" onclick="startGame()">Deal the Deck</button>
+  <div style="max-width:420px;width:100%">
+    <div class="divider">already have a code?</div>
+    <button class="btn-secondary" onclick="showScreen('join-screen')">Join a Game Instead</button>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     GAME SCREEN
-════════════════════════════════════════════════════════════════════════ -->
+<!-- ═══ JOIN — non-host enters code ═══ -->
+<div class="screen" id="join-screen">
+  <div class="panel">
+    <h2>Join a Game</h2>
+    <div class="field">
+      <label>Join Code</label>
+      <input type="text" id="join-code-input" class="join-code-input" placeholder="e.g. WOLF-4" autocapitalize="characters" maxlength="8">
+    </div>
+    <p class="error-msg" id="join-error"></p>
+    <button class="btn-primary" onclick="joinGame()">Find Game</button>
+    <div class="divider">or</div>
+    <button class="btn-secondary" onclick="showScreen('lobby-screen')">Create a New Game</button>
+  </div>
+</div>
+
+<!-- ═══ SLOT PICK — player chooses which slot is theirs ═══ -->
+<div class="screen" id="slot-screen">
+  <div class="panel">
+    <h2>Who Are You?</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px;text-align:center;font-style:italic">
+      Pick your name from the list below.
+    </p>
+    <div id="slot-list"></div>
+    <p class="error-msg" id="slot-error"></p>
+  </div>
+</div>
+
+<!-- ═══ WAITING ROOM — host waits for others to join ═══ -->
+<div class="screen" id="waiting-screen">
+  <div class="panel">
+    <h2>Waiting for Players</h2>
+    <div class="join-code-display">
+      <div class="join-code-label">Share this code</div>
+      <div class="join-code-value" id="display-join-code">—</div>
+      <div class="join-code-hint">Other players enter this at the game URL</div>
+    </div>
+    <div class="waiting-players" id="waiting-player-list"></div>
+    <p class="success-msg" id="waiting-status"></p>
+    <button class="btn-primary" id="btn-start-game" onclick="startGame()" disabled>Start Game</button>
+    <button class="btn-secondary" style="margin-top:8px" onclick="copyJoinCode()">Copy Join Code</button>
+  </div>
+</div>
+
+<!-- ═══ GAME SCREEN ═══ -->
 <div id="game-screen">
+
+  <!-- Whose turn it is -->
   <div class="turn-banner">
     <div class="turn-label">Current Turn</div>
     <div class="turn-name" id="turn-name">—</div>
+    <div class="turn-sub" id="turn-sub"></div>
   </div>
 
-  <div class="game-layout">
-    <div id="left-panel" class="player-panel">
-      <h3><span class="player-dot-lg" id="left-dot"></span><span id="left-name">Player</span></h3>
-      <div class="hand-cards" id="left-hand"></div>
-    </div>
+  <!-- All players as chips showing card count -->
+  <div class="player-roster" id="player-roster"></div>
 
-    <div class="center-col">
-      <div class="deck-area" id="deck-area" onclick="drawCard()">
-        <div class="deck-shadow"></div>
-        <div class="deck-card">
-          <div class="deck-pattern">
-            <span class="deck-count" id="deck-count">19</span>
-          </div>
+  <!-- Deck + draw controls -->
+  <div class="game-center">
+    <div class="deck-area" id="deck-area" onclick="drawCard()">
+      <div class="deck-shadow"></div>
+      <div class="deck-card">
+        <div class="deck-pattern">
+          <span class="deck-count" id="deck-count">19</span>
+          <span class="deck-label">remaining</span>
         </div>
       </div>
-      <div class="deck-label">cards remaining</div>
-      <div class="drawn-card-area" id="drawn-card-area">
-        <div class="status-bar">Click the deck to draw</div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-draw" id="btn-draw" onclick="drawCard()">Draw Card</button>
-        <button class="btn-reshuffle" onclick="confirmReshuffle()">↺ Reshuffle</button>
-      </div>
     </div>
 
-    <div id="right-panel" class="player-panel">
-      <h3><span class="player-dot-lg" id="right-dot"></span><span id="right-name">Player</span></h3>
-      <div class="hand-cards" id="right-hand"></div>
+    <!-- Card just drawn — only shown to the player who drew it -->
+    <div class="drawn-card-area" id="drawn-card-area">
+      <div class="status-bar" id="status-bar">Waiting…</div>
+    </div>
+
+    <div id="turn-action-area">
+      <!-- Filled dynamically: draw button if your turn, "not your turn" otherwise -->
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-reshuffle" onclick="confirmReshuffle()">↺ Reshuffle All</button>
     </div>
   </div>
 
-  <div class="all-players" id="extra-players"></div>
+  <!-- MY private hand -->
+  <div class="my-hand-section">
+    <h3>
+      <span class="my-hand-dot" id="my-hand-dot"></span>
+      Your Hand
+    </h3>
+    <div class="hand-cards" id="my-hand-cards"></div>
+  </div>
+
 </div>
 
 <!-- Confirm reshuffle overlay -->
 <div class="confirm-overlay" id="confirm-overlay" style="display:none">
   <div class="confirm-box">
     <h3>Reshuffle the Deck?</h3>
-    <p>All cards will be returned and the deck shuffled. Everyone's hand will be cleared.</p>
+    <p>All cards return to the deck and all hands are cleared for everyone.</p>
     <div class="confirm-btn-row">
       <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
       <button class="btn-danger" onclick="reshuffle()">Yes, Reshuffle</button>
@@ -796,11 +613,10 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// SUPABASE SETUP
+// SUPABASE
 // ═══════════════════════════════════════════════════════════════════════════
 const SUPABASE_URL  = 'https://ffztxyeevdqlhvxzcopn.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmenR4eWVldmRxbGh2eHpjb3BuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNzgxMTMsImV4cCI6MjA4Nzg1NDExM30.EdA8cwETE00YFENj-CN93ScKMFN4yfNNG63BentHiQ4';
-
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -821,225 +637,125 @@ const COLORS = ['#7eb8d4','#d47e7e','#7ed4a0','#d4c07e','#c47ed4','#d4a07e'];
 // ═══════════════════════════════════════════════════════════════════════════
 // APP STATE
 // ═══════════════════════════════════════════════════════════════════════════
-let currentUser    = null;  // Supabase auth user object (null if guest)
-let currentProfile = null;  // Row from our profiles table { id, username }
-let isGuest        = false; // True when playing without an account
+let currentUser    = null;   // Supabase auth user
+let currentProfile = null;   // { id, username } from profiles table
 
-let players            = [];
-let deck               = [];
-let hands              = {};
+// Game state — loaded from / saved to Supabase
+let gameId             = null;   // games.id
+let joinCode           = null;   // games.join_code
+let players            = [];     // [{ name, color, profileId }] in turn order
+let deck               = [];     // remaining cards (array of strings)
 let currentPlayerIndex = 0;
-let lastDrawn          = null;
-let currentGameId      = null;
+let mySlotIndex        = null;   // which player slot I am (0-based)
+let myHand             = [];     // my private cards — loaded from game_players
+let myGamePlayerId     = null;   // game_players.id for my row
+
 let isSaving           = false;
+let realtimeChannel    = null;   // Supabase realtime subscription
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STARTUP
 // ═══════════════════════════════════════════════════════════════════════════
 async function init() {
-  // Check if Supabase already has a session (user previously logged in)
   const { data: { session } } = await db.auth.getSession();
 
   if (session) {
-    // Restore the logged-in user
     currentUser = session.user;
     await loadProfile(currentUser.id);
     showUserBar();
 
-    // Check for a saved game
-    const savedId = localStorage.getItem('deck_game_id_' + currentUser.id);
-    if (savedId) {
-      const loaded = await loadGame(savedId);
-      if (loaded) return;
+    // Check if this user is mid-game
+    const savedGameId = localStorage.getItem('deck_game_' + currentUser.id);
+    if (savedGameId) {
+      const rejoined = await rejoinGame(savedGameId);
+      if (rejoined) return;
     }
-    showScreen('setup-screen');
-
+    showScreen('lobby-screen');
   } else {
-    // No session — show login
     showScreen('login-screen');
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AUTH — LOGIN
+// AUTH
 // ═══════════════════════════════════════════════════════════════════════════
 async function handleLogin() {
   const username = document.getElementById('login-username').value.trim().toLowerCase();
   const password = document.getElementById('login-password').value;
   const errEl    = document.getElementById('login-error');
   const btn      = document.getElementById('btn-login');
-
   errEl.textContent = '';
-
   if (!username) { errEl.textContent = 'Please enter your username.'; return; }
   if (!password) { errEl.textContent = 'Please enter your password.'; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-
-  // We store users as username@thedeck.game internally
-  const fakeEmail = `${username}@thedeck.game`;
-
-  const { data, error } = await db.auth.signInWithPassword({
-    email: fakeEmail,
-    password,
-  });
-
-  btn.disabled = false;
-  btn.textContent = 'Sign In';
-
-  if (error) {
-    errEl.textContent = 'Incorrect username or password.';
-    return;
-  }
-
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { data, error } = await db.auth.signInWithPassword({ email: `${username}@thedeck.game`, password });
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (error) { errEl.textContent = 'Incorrect username or password.'; return; }
   currentUser = data.user;
   await loadProfile(currentUser.id);
   showUserBar();
-
-  // Check for a saved game for this user
-  const savedId = localStorage.getItem('deck_game_id_' + currentUser.id);
-  if (savedId) {
-    const loaded = await loadGame(savedId);
-    if (loaded) return;
-  }
-
-  showScreen('setup-screen');
+  const savedGameId = localStorage.getItem('deck_game_' + currentUser.id);
+  if (savedGameId) { const rejoined = await rejoinGame(savedGameId); if (rejoined) return; }
+  showScreen('lobby-screen');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AUTH — REGISTER
-// ═══════════════════════════════════════════════════════════════════════════
 async function handleRegister() {
   const username = document.getElementById('reg-username').value.trim().toLowerCase();
   const password = document.getElementById('reg-password').value;
   const confirm  = document.getElementById('reg-confirm').value;
   const errEl    = document.getElementById('reg-error');
-  const okEl     = document.getElementById('reg-success');
   const btn      = document.getElementById('btn-register');
-
   errEl.textContent = '';
-  okEl.textContent  = '';
-
-  // Validate
-  if (!username)              { errEl.textContent = 'Please choose a username.'; return; }
-  if (username.length < 3)    { errEl.textContent = 'Username must be at least 3 characters.'; return; }
-  if (/\s/.test(username))    { errEl.textContent = 'Username cannot contain spaces.'; return; }
-  if (!password)              { errEl.textContent = 'Please choose a password.'; return; }
-  if (password.length < 6)    { errEl.textContent = 'Password must be at least 6 characters.'; return; }
-  if (password !== confirm)   { errEl.textContent = 'Passwords do not match.'; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Creating account…';
-
-  const fakeEmail = `${username}@thedeck.game`;
-
-  // Create the auth account
-  const { data, error } = await db.auth.signUp({
-    email: fakeEmail,
-    password,
-  });
-
-  if (error) {
-    btn.disabled = false;
-    btn.textContent = 'Create Account';
-    // Common case: username already taken
-    if (error.message.includes('already registered')) {
-      errEl.textContent = 'That username is already taken. Please choose another.';
-    } else {
-      errEl.textContent = error.message;
-    }
-    return;
-  }
-
-  // Create a row in our profiles table
-  const { error: profileError } = await db.from('profiles').insert({
-    id: data.user.id,
-    username: username,
-  });
-
-  btn.disabled = false;
-  btn.textContent = 'Create Account';
-
-  if (profileError) {
-    // Most likely the username is taken in profiles even if auth succeeded
-    errEl.textContent = 'That username is already taken. Please choose another.';
-    // Clean up the orphaned auth user if possible
-    await db.auth.signOut();
-    return;
-  }
-
-  // Success — auto sign them in
+  if (!username)           { errEl.textContent = 'Please choose a username.'; return; }
+  if (username.length < 3) { errEl.textContent = 'Username must be at least 3 characters.'; return; }
+  if (/\s/.test(username)) { errEl.textContent = 'Username cannot contain spaces.'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+  if (password !== confirm) { errEl.textContent = 'Passwords do not match.'; return; }
+  btn.disabled = true; btn.textContent = 'Creating…';
+  const { data, error } = await db.auth.signUp({ email: `${username}@thedeck.game`, password });
+  if (error) { btn.disabled = false; btn.textContent = 'Create Account'; errEl.textContent = error.message.includes('already') ? 'That username is taken.' : error.message; return; }
+  const { error: pe } = await db.from('profiles').insert({ id: data.user.id, username });
+  btn.disabled = false; btn.textContent = 'Create Account';
+  if (pe) { errEl.textContent = 'That username is taken.'; await db.auth.signOut(); return; }
   currentUser = data.user;
   currentProfile = { id: data.user.id, username };
   showUserBar();
-  showScreen('setup-screen');
+  showScreen('lobby-screen');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// AUTH — GUEST
-// ═══════════════════════════════════════════════════════════════════════════
-function playAsGuest() {
-  isGuest = true;
-  currentUser = null;
-  currentProfile = null;
-  document.getElementById('guest-notice').style.display = 'block';
-  showScreen('setup-screen');
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// AUTH — SIGN OUT
-// ═══════════════════════════════════════════════════════════════════════════
 async function signOut() {
+  if (realtimeChannel) await db.removeChannel(realtimeChannel);
   await db.auth.signOut();
-  currentUser    = null;
-  currentProfile = null;
-  isGuest        = false;
-  currentGameId  = null;
-
+  currentUser = currentProfile = null;
+  gameId = joinCode = null; players = []; deck = []; myHand = [];
+  mySlotIndex = myGamePlayerId = null;
   document.getElementById('user-bar').classList.remove('visible');
-  document.getElementById('guest-notice').style.display = 'none';
   document.getElementById('game-screen').style.display = 'none';
-
-  // Clear player list back to default
   resetPlayerList();
   showScreen('login-screen');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// PROFILE
-// ═══════════════════════════════════════════════════════════════════════════
 async function loadProfile(userId) {
-  const { data } = await db
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
+  const { data } = await db.from('profiles').select('*').eq('id', userId).single();
   if (data) currentProfile = data;
 }
 
 function showUserBar() {
-  const bar = document.getElementById('user-bar');
-  bar.classList.add('visible');
-  document.getElementById('user-bar-name').textContent =
-    currentProfile ? currentProfile.username : 'Player';
+  document.getElementById('user-bar').classList.add('visible');
+  document.getElementById('user-bar-name').textContent = currentProfile?.username || 'Player';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SETUP
+// LOBBY — host creates the room
 // ═══════════════════════════════════════════════════════════════════════════
 function addPlayer() {
   const list  = document.getElementById('player-list');
   const count = list.children.length + 1;
   if (count > 6) return;
-  const color = COLORS[count - 1] || '#aaa';
+  const color = COLORS[count - 1];
   const div   = document.createElement('div');
   div.className = 'player-entry';
-  div.innerHTML = `
-    <div class="player-dot" style="background:${color}"></div>
-    <input type="text" placeholder="Player ${count} name">
-  `;
+  div.innerHTML = `<div class="player-dot" style="background:${color}"></div><input type="text" placeholder="Player ${count} name">`;
   list.appendChild(div);
   if (count >= 6) document.getElementById('btn-add-player').style.display = 'none';
 }
@@ -1047,57 +763,377 @@ function addPlayer() {
 function resetPlayerList() {
   const list = document.getElementById('player-list');
   list.innerHTML = `
-    <div class="player-entry">
-      <div class="player-dot" style="background:#7eb8d4"></div>
-      <input type="text" placeholder="Player 1 name">
-    </div>
-    <div class="player-entry">
-      <div class="player-dot" style="background:#d47e7e"></div>
-      <input type="text" placeholder="Player 2 name">
-    </div>
+    <div class="player-entry"><div class="player-dot" style="background:#7eb8d4"></div><input type="text" placeholder="Player 1 name (you)"></div>
+    <div class="player-entry"><div class="player-dot" style="background:#d47e7e"></div><input type="text" placeholder="Player 2 name"></div>
   `;
   document.getElementById('btn-add-player').style.display = 'block';
 }
 
-async function startGame() {
+async function createGame() {
   const inputs = document.querySelectorAll('#player-list input');
-  players = [];
-  inputs.forEach((inp, i) => {
-    const name = inp.value.trim() || `Player ${i + 1}`;
-    players.push({ name, color: COLORS[i] });
-  });
+  const names  = [...inputs].map((inp, i) => inp.value.trim() || `Player ${i+1}`);
+  const errEl  = document.getElementById('lobby-error');
+  errEl.textContent = '';
 
-  hands              = {};
-  players.forEach(p => hands[p.name] = []);
+  if (names.length < 2) { errEl.textContent = 'You need at least 2 players.'; return; }
+
+  // Build player slots
+  players = names.map((name, i) => ({ name, color: COLORS[i], profileId: null, handCount: 0 }));
+
+  // Shuffle the deck
+  deck = shuffle([...CARD_TEXTS]);
   currentPlayerIndex = 0;
-  lastDrawn          = null;
-  deck               = shuffle([...CARD_TEXTS]);
 
-  const btn = document.querySelector('#setup-screen .btn-primary');
-  btn.disabled    = true;
-  btn.textContent = 'Starting…';
+  const code = generateJoinCode();
 
-  let saved = true;
-  if (!isGuest) {
-    saved = await saveNewGame();
-  } else {
-    // Guest — just store in sessionStorage
-    sessionStorage.setItem('deck_guest_state', JSON.stringify(buildGameState()));
+  showSyncing('Creating room…');
+
+  // Insert game row
+  const { data: gameData, error: gameError } = await db
+    .from('games')
+    .insert({
+      join_code:            code,
+      deck:                 { deck, players, currentPlayerIndex },
+      current_player_index: 0,
+      status:               'waiting',  // waiting until host starts
+    })
+    .select().single();
+
+  if (gameError) { showSyncError(); errEl.textContent = 'Could not create game. Try again.'; return; }
+
+  gameId   = gameData.id;
+  joinCode = code;
+
+  // Host claims slot 0
+  mySlotIndex = 0;
+  players[0].profileId = currentUser.id;
+
+  const { data: gpData, error: gpError } = await db
+    .from('game_players')
+    .insert({
+      game_id:     gameId,
+      profile_id:  currentUser.id,
+      display_name: players[0].name,
+      hand:        [],
+      turn_order:  0,
+    })
+    .select().single();
+
+  if (gpError) { showSyncError(); errEl.textContent = 'Could not join game slot.'; return; }
+
+  myGamePlayerId = gpData.id;
+  myHand = [];
+
+  // Save to localStorage so host can rejoin
+  localStorage.setItem('deck_game_' + currentUser.id, gameId);
+
+  showSynced();
+
+  // Subscribe to realtime so waiting room updates as others join
+  subscribeToGame();
+
+  // Show waiting room
+  document.getElementById('display-join-code').textContent = joinCode;
+  renderWaitingRoom();
+  showScreen('waiting-screen');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAITING ROOM
+// ═══════════════════════════════════════════════════════════════════════════
+function renderWaitingRoom() {
+  const list    = document.getElementById('waiting-player-list');
+  const btnStart = document.getElementById('btn-start-game');
+
+  list.innerHTML = players.map((p, i) => `
+    <div class="waiting-player-row">
+      <div class="player-dot" style="background:${p.color}"></div>
+      <span class="slot-name">${p.name}</span>
+      <span class="slot-status ${p.profileId ? 'joined' : ''}">${p.profileId ? '✓ joined' : 'waiting…'}</span>
+    </div>
+  `).join('');
+
+  // Can start when all slots are claimed
+  const allJoined = players.every(p => p.profileId !== null);
+  btnStart.disabled = !allJoined;
+  document.getElementById('waiting-status').textContent = allJoined
+    ? 'Everyone is here! You can start the game.'
+    : `Waiting for ${players.filter(p => !p.profileId).length} more player(s)…`;
+}
+
+async function startGame() {
+  showSyncing('Starting…');
+  const { error } = await db
+    .from('games')
+    .update({ status: 'active', deck: { deck, players, currentPlayerIndex } })
+    .eq('id', gameId);
+
+  if (error) { showSyncError(); return; }
+  showSynced();
+
+  // Log start event
+  await logEvent('start', null);
+  enterGameScreen();
+}
+
+function copyJoinCode() {
+  navigator.clipboard.writeText(joinCode).then(() => {
+    document.getElementById('waiting-status').textContent = 'Code copied to clipboard!';
+    setTimeout(() => renderWaitingRoom(), 2000);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// JOIN — non-host enters code
+// ═══════════════════════════════════════════════════════════════════════════
+async function joinGame() {
+  const code  = document.getElementById('join-code-input').value.trim().toUpperCase();
+  const errEl = document.getElementById('join-error');
+  errEl.textContent = '';
+
+  if (!code) { errEl.textContent = 'Please enter a join code.'; return; }
+
+  const btn = document.querySelector('#join-screen .btn-primary');
+  btn.disabled = true; btn.textContent = 'Searching…';
+
+  const { data, error } = await db
+    .from('games')
+    .select('*')
+    .eq('join_code', code)
+    .in('status', ['waiting','active'])
+    .single();
+
+  btn.disabled = false; btn.textContent = 'Find Game';
+
+  if (error || !data) { errEl.textContent = 'Game not found. Check the code and try again.'; return; }
+
+  // Restore game state
+  gameId   = data.id;
+  joinCode = data.join_code;
+  const state        = data.deck;
+  deck               = state.deck;
+  players            = state.players;
+  currentPlayerIndex = state.currentPlayerIndex;
+
+  // Load existing game_players to see which slots are taken
+  const { data: gpRows } = await db
+    .from('game_players')
+    .select('*')
+    .eq('game_id', gameId);
+
+  if (gpRows) {
+    gpRows.forEach(row => {
+      const idx = players.findIndex(p => p.name === row.display_name);
+      if (idx !== -1) players[idx].profileId = row.profile_id;
+    });
+
+    // Check if this user already has a slot (rejoin mid-game)
+    const myRow = gpRows.find(r => r.profile_id === currentUser.id);
+    if (myRow) {
+      myGamePlayerId = myRow.id;
+      myHand         = myRow.hand || [];
+      mySlotIndex    = players.findIndex(p => p.profileId === currentUser.id);
+      localStorage.setItem('deck_game_' + currentUser.id, gameId);
+      subscribeToGame();
+      if (data.status === 'active') { enterGameScreen(); return; }
+    }
   }
 
-  btn.disabled    = false;
-  btn.textContent = 'Deal the Deck';
+  // Show slot picker — which player are you?
+  renderSlotPicker();
+  showScreen('slot-screen');
+}
 
-  if (!saved) {
-    document.getElementById('setup-error').textContent = 'Could not save to database. Check your connection.';
+function renderSlotPicker() {
+  const list  = document.getElementById('slot-list');
+  const taken = players.filter(p => p.profileId !== null).map(p => p.name);
+
+  list.innerHTML = players.map((p, i) => {
+    const isTaken = p.profileId !== null;
+    return `
+      <div class="waiting-player-row" style="${isTaken ? 'opacity:0.4;pointer-events:none' : 'cursor:pointer'}" onclick="claimSlot(${i})">
+        <div class="player-dot" style="background:${p.color}"></div>
+        <span class="slot-name">${p.name}</span>
+        <span class="slot-status ${isTaken ? 'joined' : ''}">${isTaken ? 'taken' : 'claim →'}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function claimSlot(slotIndex) {
+  const errEl = document.getElementById('slot-error');
+  errEl.textContent = '';
+
+  // Double-check slot isn't taken
+  const { data: existing } = await db
+    .from('game_players')
+    .select('id')
+    .eq('game_id', gameId)
+    .eq('display_name', players[slotIndex].name)
+    .single();
+
+  if (existing) { errEl.textContent = 'That slot was just taken. Please pick another.'; renderSlotPicker(); return; }
+
+  showSyncing('Joining…');
+
+  const { data: gpData, error } = await db
+    .from('game_players')
+    .insert({
+      game_id:      gameId,
+      profile_id:   currentUser.id,
+      display_name: players[slotIndex].name,
+      hand:         [],
+      turn_order:   slotIndex,
+    })
+    .select().single();
+
+  if (error) { showSyncError(); errEl.textContent = 'Could not claim slot. Try again.'; return; }
+
+  mySlotIndex    = slotIndex;
+  myGamePlayerId = gpData.id;
+  myHand         = [];
+  players[slotIndex].profileId = currentUser.id;
+
+  // Update the game's player list so host waiting room reflects the join
+  await db.from('games').update({
+    deck: { deck, players, currentPlayerIndex }
+  }).eq('id', gameId);
+
+  localStorage.setItem('deck_game_' + currentUser.id, gameId);
+  showSynced();
+  subscribeToGame();
+
+  // Check if game already started
+  const { data: gameData } = await db.from('games').select('status').eq('id', gameId).single();
+  if (gameData?.status === 'active') { enterGameScreen(); }
+  else {
+    // Wait for host to start — subscribe will handle the transition
+    document.getElementById('waiting-status').textContent = `You've joined as ${players[slotIndex].name}. Waiting for the host to start…`;
+    showScreen('waiting-screen');
+    document.getElementById('display-join-code').textContent = joinCode;
+    document.getElementById('btn-start-game').style.display = 'none';
+    renderWaitingRoom();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REJOIN — returning player restores their session
+// ═══════════════════════════════════════════════════════════════════════════
+async function rejoinGame(savedGameId) {
+  try {
+    const { data: gameData, error } = await db
+      .from('games').select('*').eq('id', savedGameId).in('status',['waiting','active']).single();
+
+    if (error || !gameData) { localStorage.removeItem('deck_game_' + currentUser.id); return false; }
+
+    gameId   = gameData.id;
+    joinCode = gameData.join_code;
+    const state = gameData.deck;
+    deck               = state.deck;
+    players            = state.players;
+    currentPlayerIndex = state.currentPlayerIndex;
+
+    // Find my game_players row
+    const { data: gpData } = await db
+      .from('game_players').select('*').eq('game_id', gameId).eq('profile_id', currentUser.id).single();
+
+    if (!gpData) { localStorage.removeItem('deck_game_' + currentUser.id); return false; }
+
+    myGamePlayerId = gpData.id;
+    myHand         = gpData.hand || [];
+    mySlotIndex    = gpData.turn_order;
+
+    subscribeToGame();
+
+    if (gameData.status === 'active') { enterGameScreen(); return true; }
+
+    // Game still in waiting — show waiting room
+    document.getElementById('display-join-code').textContent = joinCode;
+    // Hide start button if not the host (slot 0)
+    if (mySlotIndex !== 0) document.getElementById('btn-start-game').style.display = 'none';
+    renderWaitingRoom();
+    showScreen('waiting-screen');
+    return true;
+
+  } catch (err) {
+    console.error('Rejoin error:', err);
+    localStorage.removeItem('deck_game_' + currentUser.id);
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// REALTIME — subscribe to game changes
+// ═══════════════════════════════════════════════════════════════════════════
+function subscribeToGame() {
+  if (realtimeChannel) db.removeChannel(realtimeChannel);
+
+  realtimeChannel = db.channel(`game-${gameId}`)
+    // Listen for changes to the games table (deck, turn, status)
+    .on('postgres_changes', {
+      event:  'UPDATE',
+      schema: 'public',
+      table:  'games',
+      filter: `id=eq.${gameId}`,
+    }, handleGameUpdate)
+
+    // Listen for changes to game_players (someone joined or drew a card)
+    .on('postgres_changes', {
+      event:  '*',
+      schema: 'public',
+      table:  'game_players',
+      filter: `game_id=eq.${gameId}`,
+    }, handlePlayerUpdate)
+
+    .subscribe();
+}
+
+function handleGameUpdate(payload) {
+  const updated = payload.new;
+
+  // If game just became active, enter game screen
+  if (updated.status === 'active' && document.getElementById('game-screen').style.display === 'none') {
+    const state        = updated.deck;
+    deck               = state.deck;
+    players            = state.players;
+    currentPlayerIndex = state.currentPlayerIndex;
+    enterGameScreen();
     return;
   }
 
-  document.getElementById('setup-error').textContent = '';
-  showScreen(null); // hide all screens
-  document.getElementById('game-screen').style.display = 'block';
-  renderPlayerPanels();
-  updateUI();
+  // Update shared state
+  const state        = updated.deck;
+  deck               = state.deck;
+  players            = state.players;
+  currentPlayerIndex = state.currentPlayerIndex;
+
+  // If on waiting screen, refresh it
+  if (document.getElementById('waiting-screen').classList.contains('active')) {
+    renderWaitingRoom();
+    return;
+  }
+
+  updateGameUI();
+}
+
+function handlePlayerUpdate(payload) {
+  // If someone joined (INSERT) and we're on waiting screen, refresh
+  if (payload.eventType === 'INSERT') {
+    const newRow = payload.new;
+    const idx    = players.findIndex(p => p.name === newRow.display_name);
+    if (idx !== -1) players[idx].profileId = newRow.profile_id;
+    if (document.getElementById('waiting-screen').classList.contains('active')) renderWaitingRoom();
+    return;
+  }
+
+  // If UPDATE, it's someone updating their hand count
+  if (payload.eventType === 'UPDATE') {
+    const row = payload.new;
+    // Update our local hand count display for that player
+    const idx = players.findIndex(p => p.name === row.display_name);
+    if (idx !== -1) players[idx].handCount = (row.hand || []).length;
+    updateGameUI();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1113,263 +1149,198 @@ function shuffle(arr) {
 
 async function drawCard() {
   if (deck.length === 0 || isSaving) return;
+  if (mySlotIndex !== currentPlayerIndex) return; // not your turn
 
-  const card   = deck.pop();
-  const player = players[currentPlayerIndex];
-  hands[player.name].push(card);
-  lastDrawn          = { card, playerName: player.name };
+  const card = deck.pop();
+  myHand.push(card);
+  players[mySlotIndex].handCount = myHand.length;
   currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
 
-  updateUI();
-  await persistState('draw', card);
+  // Show the drawn card immediately to this player only
+  showDrawnCard(card);
+  updateGameUI();
+
+  isSaving = true;
+  showSyncing('Saving…');
+
+  try {
+    // 1. Update shared game state (deck + turn)
+    const { error: gameErr } = await db
+      .from('games')
+      .update({
+        deck:                 { deck, players, currentPlayerIndex },
+        current_player_index: currentPlayerIndex,
+      })
+      .eq('id', gameId);
+
+    // 2. Save my private hand to game_players
+    const { error: handErr } = await db
+      .from('game_players')
+      .update({ hand: myHand })
+      .eq('id', myGamePlayerId);
+
+    if (gameErr || handErr) { showSyncError(); }
+    else {
+      showSynced();
+      await logEvent('draw', card);
+    }
+  } catch (err) { console.error(err); showSyncError(); }
+  finally { isSaving = false; }
 }
 
 async function reshuffle() {
   closeConfirm();
   deck               = shuffle([...CARD_TEXTS]);
-  players.forEach(p => hands[p.name] = []);
-  lastDrawn          = null;
+  myHand             = [];
   currentPlayerIndex = 0;
+  players.forEach(p => p.handCount = 0);
 
-  updateUI();
-  renderHandsOnly();
-  await persistState('reshuffle', null);
-}
+  updateGameUI();
+  renderMyHand();
+  clearDrawnCard();
 
-// Single function that handles saving for both logged-in and guest players
-async function persistState(eventType, cardText) {
-  if (isGuest) {
-    sessionStorage.setItem('deck_guest_state', JSON.stringify(buildGameState()));
-    return;
-  }
-  await saveGameState();
-  await logEvent(eventType, cardText);
-}
+  isSaving = true;
+  showSyncing('Reshuffling…');
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SUPABASE — DATABASE OPERATIONS
-// ═══════════════════════════════════════════════════════════════════════════
-async function saveNewGame() {
   try {
-    showSyncing('Saving…');
-    const { data, error } = await db
-      .from('games')
-      .insert({
-        join_code:             generateJoinCode(),
-        deck:                  buildGameState(),
-        current_player_index:  currentPlayerIndex,
-        status:                'active',
-      })
-      .select()
-      .single();
+    // Reset game state
+    await db.from('games').update({
+      deck:                 { deck, players, currentPlayerIndex },
+      current_player_index: 0,
+    }).eq('id', gameId);
 
-    if (error) { console.error(error); showSyncError(); return false; }
+    // Clear all hands in game_players
+    await db.from('game_players').update({ hand: [] }).eq('game_id', gameId);
 
-    currentGameId = data.id;
-    // Store against the user ID so different users don't collide
-    localStorage.setItem('deck_game_id_' + currentUser.id, currentGameId);
     showSynced();
-    return true;
-
-  } catch (err) { console.error(err); showSyncError(); return false; }
-}
-
-async function saveGameState() {
-  if (!currentGameId || isSaving) return;
-  try {
-    isSaving = true;
-    showSyncing('Saving…');
-    const { error } = await db
-      .from('games')
-      .update({
-        deck:                  buildGameState(),
-        current_player_index:  currentPlayerIndex,
-      })
-      .eq('id', currentGameId);
-
-    if (error) { console.error(error); showSyncError(); }
-    else        { showSynced(); }
+    await logEvent('reshuffle', null);
   } catch (err) { console.error(err); showSyncError(); }
-  finally       { isSaving = false; }
+  finally { isSaving = false; }
 }
 
-async function loadGame(gameId) {
-  try {
-    const { data, error } = await db
-      .from('games')
-      .select('*')
-      .eq('id', gameId)
-      .eq('status', 'active')
-      .single();
+// ═══════════════════════════════════════════════════════════════════════════
+// GAME SCREEN RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function enterGameScreen() {
+  showScreen(null);
+  document.getElementById('game-screen').style.display = 'block';
 
-    if (error || !data) {
-      localStorage.removeItem('deck_game_id_' + currentUser.id);
-      return false;
-    }
+  // Set my hand dot colour
+  if (mySlotIndex !== null) {
+    document.getElementById('my-hand-dot').style.background = players[mySlotIndex]?.color || '#aaa';
+  }
 
-    const state        = data.deck;
-    players            = state.players;
-    deck               = state.deck;
-    hands              = state.hands;
-    lastDrawn          = state.lastDrawn;
-    currentPlayerIndex = data.current_player_index;
-    currentGameId      = data.id;
+  // Sync my hand count into players array
+  if (mySlotIndex !== null) players[mySlotIndex].handCount = myHand.length;
 
-    showScreen(null);
-    document.getElementById('game-screen').style.display = 'block';
-    renderPlayerPanels();
-    updateUI();
-    return true;
+  clearDrawnCard();
+  updateGameUI();
+  renderMyHand();
+}
 
-  } catch (err) {
-    console.error(err);
-    localStorage.removeItem('deck_game_id_' + currentUser?.id);
-    return false;
+function updateGameUI() {
+  // Deck count
+  const remaining = deck.length;
+  document.getElementById('deck-count').textContent = remaining;
+  document.getElementById('deck-area').classList.toggle('empty', remaining === 0);
+
+  // Turn banner
+  const current = players[currentPlayerIndex];
+  const isMyTurn = mySlotIndex === currentPlayerIndex;
+  const turnEl  = document.getElementById('turn-name');
+  turnEl.textContent = current?.name || '—';
+  turnEl.style.color = current?.color || 'var(--gold)';
+  document.getElementById('turn-sub').textContent = isMyTurn ? 'It\'s your turn!' : '';
+
+  // Player roster chips
+  const roster = document.getElementById('player-roster');
+  roster.innerHTML = players.map((p, i) => `
+    <div class="roster-chip ${i === currentPlayerIndex ? 'is-turn' : ''} ${i === mySlotIndex ? 'is-me' : ''}">
+      <div class="roster-dot" style="background:${p.color}"></div>
+      ${p.name}
+      <span class="roster-count">(${p.handCount || 0})</span>
+    </div>
+  `).join('');
+
+  // Turn action area
+  const actionArea = document.getElementById('turn-action-area');
+  if (remaining === 0) {
+    actionArea.innerHTML = `<div class="status-bar"><span class="highlight">Deck empty — reshuffle to continue</span></div>`;
+  } else if (isMyTurn) {
+    actionArea.innerHTML = `<button class="btn-draw" onclick="drawCard()">Draw Card</button>`;
+  } else {
+    actionArea.innerHTML = `<div class="not-your-turn">Waiting for ${current?.name} to draw…</div>`;
   }
 }
 
-async function logEvent(eventType, cardText) {
-  if (!currentGameId) return;
-  try {
-    await db.from('game_events').insert({
-      game_id:    currentGameId,
-      profile_id: currentUser?.id || null,
-      event_type: eventType,
-      card_text:  cardText,
-    });
-  } catch (err) { console.warn('Event log failed:', err); }
+function renderMyHand() {
+  const el = document.getElementById('my-hand-cards');
+  if (myHand.length === 0) {
+    el.innerHTML = '<div class="hand-empty">No cards yet</div>';
+  } else {
+    el.innerHTML = myHand.map(c => `<div class="hand-card">${c}</div>`).join('');
+  }
+}
+
+function showDrawnCard(card) {
+  document.getElementById('drawn-card-area').innerHTML = `
+    <div class="drawn-card">${card}</div>
+    <div class="drawn-label">You drew this card</div>
+  `;
+  // Auto-hide after 8 seconds
+  setTimeout(() => clearDrawnCard(), 8000);
+}
+
+function clearDrawnCard() {
+  const isMyTurn = mySlotIndex === currentPlayerIndex;
+  document.getElementById('drawn-card-area').innerHTML =
+    `<div class="status-bar">${isMyTurn ? 'Your turn — draw a card' : ''}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
-function buildGameState() {
-  return { players, deck, hands, lastDrawn };
-}
-
 function generateJoinCode() {
   const words = ['WOLF','HAWK','VIPER','ECHO','GHOST','RAVEN','COBRA','LYNX'];
   return `${words[Math.floor(Math.random()*words.length)]}-${Math.floor(Math.random()*9)+1}`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// SYNC INDICATOR
-// ═══════════════════════════════════════════════════════════════════════════
-let syncTimer = null;
-
-function showSyncing(text) {
-  clearTimeout(syncTimer);
-  const i = document.getElementById('sync-indicator');
-  document.getElementById('sync-dot').className  = 'sync-dot saving';
-  document.getElementById('sync-text').textContent = text;
-  i.classList.add('visible');
-}
-
-function showSynced() {
-  const i = document.getElementById('sync-indicator');
-  document.getElementById('sync-dot').className  = 'sync-dot saved';
-  document.getElementById('sync-text').textContent = 'Saved';
-  syncTimer = setTimeout(() => i.classList.remove('visible'), 2000);
-}
-
-function showSyncError() {
-  const i = document.getElementById('sync-indicator');
-  document.getElementById('sync-dot').className  = 'sync-dot error';
-  document.getElementById('sync-text').textContent = 'Save failed';
-  syncTimer = setTimeout(() => i.classList.remove('visible'), 3000);
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════════════════════════════════
-function renderPlayerPanels() {
-  document.getElementById('left-dot').style.background  = players[0].color;
-  document.getElementById('left-name').textContent       = players[0].name;
-  const right = players[1] || players[0];
-  document.getElementById('right-dot').style.background = right.color;
-  document.getElementById('right-name').textContent      = right.name;
-
-  const extra = document.getElementById('extra-players');
-  extra.innerHTML = '';
-  players.slice(2).forEach((p, i) => {
-    const panel = document.createElement('div');
-    panel.className = 'player-panel';
-    panel.innerHTML = `
-      <h3><span class="player-dot-lg" style="background:${p.color}"></span>${p.name}</h3>
-      <div class="hand-cards" id="extra-hand-${i}"></div>
-    `;
-    extra.appendChild(panel);
-  });
-}
-
-function renderHandsOnly() {
-  renderHand('left-hand', players[0].name);
-  if (players[1]) renderHand('right-hand', players[1].name);
-  players.slice(2).forEach((p, i) => renderHand(`extra-hand-${i}`, p.name));
-}
-
-function renderHand(containerId, playerName) {
-  const el    = document.getElementById(containerId);
-  if (!el)    return;
-  const cards = hands[playerName] || [];
-  el.innerHTML = cards.length === 0
-    ? '<div class="hand-empty">No cards yet</div>'
-    : cards.map(c => `<div class="hand-card">${c}</div>`).join('');
-}
-
-function updateUI() {
-  const remaining = deck.length;
-  document.getElementById('deck-count').textContent      = remaining;
-  document.getElementById('deck-area').classList.toggle('empty', remaining === 0);
-  document.getElementById('btn-draw').disabled           = remaining === 0;
-
-  const current = players[currentPlayerIndex];
-  const turnEl  = document.getElementById('turn-name');
-  turnEl.textContent  = current.name;
-  turnEl.style.color  = current.color;
-
-  const drawnArea = document.getElementById('drawn-card-area');
-  if (lastDrawn) {
-    drawnArea.innerHTML = `
-      <div class="drawn-card">${lastDrawn.card}</div>
-      <div class="drawn-by">Drawn by ${lastDrawn.playerName}</div>
-    `;
-  } else if (remaining === 0) {
-    drawnArea.innerHTML = `<div class="status-bar"><span class="highlight">Deck is empty — reshuffle to play again!</span></div>`;
-  } else {
-    drawnArea.innerHTML = `<div class="status-bar">Click the deck to draw</div>`;
-  }
-
-  renderHandsOnly();
+async function logEvent(type, card) {
+  if (!gameId) return;
+  try {
+    await db.from('game_events').insert({
+      game_id:    gameId,
+      profile_id: currentUser.id,
+      event_type: type,
+      card_text:  card,
+    });
+  } catch (e) { console.warn('Event log failed', e); }
 }
 
 function confirmReshuffle() { document.getElementById('confirm-overlay').style.display = 'flex'; }
 function closeConfirm()     { document.getElementById('confirm-overlay').style.display = 'none'; }
+document.getElementById('confirm-overlay').addEventListener('click', e => { if (e.target === document.getElementById('confirm-overlay')) closeConfirm(); });
 
-document.getElementById('confirm-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeConfirm();
-});
+// ═══════════════════════════════════════════════════════════════════════════
+// SYNC INDICATOR
+// ═══════════════════════════════════════════════════════════════════════════
+let syncTimer = null;
+function showSyncing(t) { clearTimeout(syncTimer); document.getElementById('sync-dot').className='sync-dot saving'; document.getElementById('sync-text').textContent=t; document.getElementById('sync-indicator').classList.add('visible'); }
+function showSynced()   { document.getElementById('sync-dot').className='sync-dot saved';  document.getElementById('sync-text').textContent='Saved';  syncTimer=setTimeout(()=>document.getElementById('sync-indicator').classList.remove('visible'),2000); }
+function showSyncError(){ document.getElementById('sync-dot').className='sync-dot error';  document.getElementById('sync-text').textContent='Error';  syncTimer=setTimeout(()=>document.getElementById('sync-indicator').classList.remove('visible'),3000); }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SCREEN MANAGEMENT
 // ═══════════════════════════════════════════════════════════════════════════
 function showScreen(id) {
-  // Hide all screens
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('game-screen').style.display = 'none';
-  if (id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('active');
-  }
+  if (id) { const el = document.getElementById(id); if (el) el.classList.add('active'); }
 }
 
-// Allow pressing Enter to submit login/register forms
-document.getElementById('login-password').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleLogin();
-});
-document.getElementById('reg-confirm').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleRegister();
-});
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key==='Enter') handleLogin(); });
+document.getElementById('reg-confirm').addEventListener('keydown',    e => { if (e.key==='Enter') handleRegister(); });
+document.getElementById('join-code-input').addEventListener('keydown',e => { if (e.key==='Enter') joinGame(); });
 
 // ═══════════════════════════════════════════════════════════════════════════
 // START
