@@ -1157,8 +1157,10 @@ async function drawCard() {
   currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
 
   // Show the drawn card immediately to this player only
+  // And add it to the player's hand list.
   showDrawnCard(card);
   updateGameUI();
+  renderMyHand();
 
   isSaving = true;
   showSyncing('Saving…');
