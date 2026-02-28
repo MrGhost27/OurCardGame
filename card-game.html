@@ -579,6 +579,7 @@
 
     <div class="btn-row">
       <button class="btn-reshuffle" onclick="confirmReshuffle()">↺ Reshuffle All</button>
+      <button class="btn-reshuffle" onclick="confirmEndGame()" style="border-color:rgba(224,112,112,0.3);color:#e07070">✕ End Game</button>
     </div>
   </div>
 
@@ -601,6 +602,18 @@
     <div class="confirm-btn-row">
       <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
       <button class="btn-danger" onclick="reshuffle()">Yes, Reshuffle</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm end game overlay -->
+<div class="confirm-overlay" id="end-game-overlay" style="display:none">
+  <div class="confirm-box">
+    <h3>End the Game?</h3>
+    <p>This will end the game for all players. Everyone will be returned to the lobby.</p>
+    <div class="confirm-btn-row">
+      <button class="btn-ghost" onclick="closeEndGame()">Cancel</button>
+      <button class="btn-danger" onclick="endGame()">Yes, End Game</button>
     </div>
   </div>
 </div>
@@ -664,11 +677,13 @@ async function init() {
     await loadProfile(currentUser.id);
     showUserBar();
 
-    // Check if this user is mid-game
     const savedGameId = localStorage.getItem('deck_game_' + currentUser.id);
     if (savedGameId) {
       const rejoined = await rejoinGame(savedGameId);
       if (rejoined) return;
+      // ── Stage 5: saved game was not found (finished or expired) ──────────
+      // Clear it and drop through to lobby with a friendly notice
+      localStorage.removeItem('deck_game_' + currentUser.id);
     }
     showScreen('lobby-screen');
   } else {
@@ -1024,7 +1039,11 @@ async function rejoinGame(savedGameId) {
     const { data: gameData, error } = await db
       .from('games').select('*').eq('id', savedGameId).in('status',['waiting','active']).single();
 
-    if (error || !gameData) { localStorage.removeItem('deck_game_' + currentUser.id); return false; }
+    // ── Stage 5: game no longer exists or is finished ──────────────────────
+    if (error || !gameData) {
+      localStorage.removeItem('deck_game_' + currentUser.id);
+      return false;
+    }
 
     gameId   = gameData.id;
     joinCode = gameData.join_code;
@@ -1033,23 +1052,34 @@ async function rejoinGame(savedGameId) {
     players            = state.players;
     currentPlayerIndex = state.currentPlayerIndex;
 
-    // Find my game_players row
-    const { data: gpData } = await db
-      .from('game_players').select('*').eq('game_id', gameId).eq('profile_id', currentUser.id).single();
+    // ── Stage 4: load ALL players' rows so hand counts are correct ─────────
+    const { data: allRows } = await db
+      .from('game_players').select('*').eq('game_id', gameId);
 
-    if (!gpData) { localStorage.removeItem('deck_game_' + currentUser.id); return false; }
+    if (allRows) {
+      allRows.forEach(row => {
+        const idx = players.findIndex(p => p.name === row.display_name);
+        if (idx !== -1) {
+          players[idx].profileId = row.profile_id;
+          players[idx].handCount = (row.hand || []).length;
+        }
+      });
+    }
 
-    myGamePlayerId = gpData.id;
-    myHand         = gpData.hand || [];
-    mySlotIndex    = gpData.turn_order;
+    // Find my own row
+    const myRow = allRows?.find(r => r.profile_id === currentUser.id);
+    if (!myRow) { localStorage.removeItem('deck_game_' + currentUser.id); return false; }
+
+    myGamePlayerId = myRow.id;
+    myHand         = myRow.hand || [];
+    mySlotIndex    = myRow.turn_order;
 
     subscribeToGame();
 
     if (gameData.status === 'active') { enterGameScreen(); return true; }
 
-    // Game still in waiting — show waiting room
+    // Game still waiting — show waiting room
     document.getElementById('display-join-code').textContent = joinCode;
-    // Hide start button if not the host (slot 0)
     if (mySlotIndex !== 0) document.getElementById('btn-start-game').style.display = 'none';
     renderWaitingRoom();
     showScreen('waiting-screen');
@@ -1091,6 +1121,12 @@ function subscribeToGame() {
 function handleGameUpdate(payload) {
   const updated = payload.new;
 
+  // ── Stage 5: game was ended by host ───────────────────────────────────────
+  if (updated.status === 'finished') {
+    returnToLobby();
+    return;
+  }
+
   // If game just became active, enter game screen
   if (updated.status === 'active' && document.getElementById('game-screen').style.display === 'none') {
     const state        = updated.deck;
@@ -1126,12 +1162,26 @@ function handlePlayerUpdate(payload) {
     return;
   }
 
-  // If UPDATE, it's someone updating their hand count
+  // UPDATE — someone drew a card (their hand changed) or reshuffle cleared hands
   if (payload.eventType === 'UPDATE') {
-    const row = payload.new;
-    // Update our local hand count display for that player
-    const idx = players.findIndex(p => p.name === row.display_name);
+    const row    = payload.new;
+    const idx    = players.findIndex(p => p.name === row.display_name);
+    const isMe   = row.profile_id === currentUser.id;
+
+    // ── Stage 4: update hand count for the player who changed ─────────────
     if (idx !== -1) players[idx].handCount = (row.hand || []).length;
+
+    // ── Stage 5: if it's my row and hand was cleared (reshuffle), update UI
+    if (isMe) {
+      const newHand = row.hand || [];
+      // Only update if the incoming hand differs from what we have locally
+      // (avoids overwriting our hand with a stale broadcast of our own draw)
+      if (newHand.length < myHand.length || newHand.length === 0) {
+        myHand = newHand;
+        renderMyHand();
+      }
+    }
+
     updateGameUI();
   }
 }
@@ -1157,10 +1207,8 @@ async function drawCard() {
   currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
 
   // Show the drawn card immediately to this player only
-  // And add it to the player's hand list.
   showDrawnCard(card);
   updateGameUI();
-  renderMyHand();
 
   isSaving = true;
   showSyncing('Saving…');
@@ -1223,7 +1271,7 @@ async function reshuffle() {
 // ═══════════════════════════════════════════════════════════════════════════
 // GAME SCREEN RENDER
 // ═══════════════════════════════════════════════════════════════════════════
-function enterGameScreen() {
+async function enterGameScreen() {
   showScreen(null);
   document.getElementById('game-screen').style.display = 'block';
 
@@ -1232,8 +1280,21 @@ function enterGameScreen() {
     document.getElementById('my-hand-dot').style.background = players[mySlotIndex]?.color || '#aaa';
   }
 
-  // Sync my hand count into players array
-  if (mySlotIndex !== null) players[mySlotIndex].handCount = myHand.length;
+  // ── Stage 4: fetch ALL players' current hand counts from the database ────
+  // Ensures roster chips show accurate counts for everyone on load.
+  try {
+    const { data: allRows } = await db
+      .from('game_players').select('display_name, hand').eq('game_id', gameId);
+    if (allRows) {
+      allRows.forEach(row => {
+        const idx = players.findIndex(p => p.name === row.display_name);
+        if (idx !== -1) players[idx].handCount = (row.hand || []).length;
+      });
+    }
+  } catch (e) {
+    // Non-critical — fall back to local count
+    if (mySlotIndex !== null) players[mySlotIndex].handCount = myHand.length;
+  }
 
   clearDrawnCard();
   updateGameUI();
@@ -1322,6 +1383,36 @@ async function logEvent(type, card) {
 function confirmReshuffle() { document.getElementById('confirm-overlay').style.display = 'flex'; }
 function closeConfirm()     { document.getElementById('confirm-overlay').style.display = 'none'; }
 document.getElementById('confirm-overlay').addEventListener('click', e => { if (e.target === document.getElementById('confirm-overlay')) closeConfirm(); });
+
+// ── Stage 5: End game ──────────────────────────────────────────────────────
+function confirmEndGame() { document.getElementById('end-game-overlay').style.display = 'flex'; }
+function closeEndGame()   { document.getElementById('end-game-overlay').style.display = 'none'; }
+document.getElementById('end-game-overlay').addEventListener('click', e => { if (e.target === document.getElementById('end-game-overlay')) closeEndGame(); });
+
+async function endGame() {
+  closeEndGame();
+  showSyncing('Ending game…');
+  try {
+    await db.from('games').update({ status: 'finished' }).eq('id', gameId);
+    // The realtime update will trigger handleGameUpdate for all players
+    showSynced();
+  } catch (err) { console.error(err); showSyncError(); }
+}
+
+function returnToLobby() {
+  // Clean up
+  if (realtimeChannel) db.removeChannel(realtimeChannel);
+  realtimeChannel = null;
+  localStorage.removeItem('deck_game_' + currentUser.id);
+  gameId = joinCode = null;
+  players = []; deck = []; myHand = [];
+  mySlotIndex = myGamePlayerId = null;
+  currentPlayerIndex = 0;
+
+  document.getElementById('game-screen').style.display = 'none';
+  resetPlayerList();
+  showScreen('lobby-screen');
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SYNC INDICATOR
