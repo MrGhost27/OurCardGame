@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1410;
+    --surface: #242018;
+    --card-bg: #f5f0e8;
+    --card-border: #c8b89a;
+    --ink: #2c2416;
+    --gold: #c9a84c;
+    --gold-light: #e8d08a;
+    --muted: #6b5d4a;
+    --player-colors: #7eb8d4, #d47e7e, #7ed4a0, #d4c07e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--card-bg);
+    font-family: 'Crimson Text', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 50%);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .setup-card {
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    padding: 28px;
+    width: 100%;
+  }
+
+  .setup-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+  }
+
+  .player-entry {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+
+  .player-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 6px;
+    color: var(--card-bg);
+    font-family: 'Crimson Text', serif;
+    font-size: 1rem;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--gold);
+  }
+
+  .btn-add-player {
+    background: none;
+    border: 1px dashed rgba(201,168,76,0.3);
+    color: var(--muted);
+    font-family: 'Crimson Text', serif;
+    font-size: 0.95rem;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+
+  .btn-add-player:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #c9a84c, #a8853a);
+    color: #1a1410;
+    border: none;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 14px 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(201,168,76,0.35);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  /* GAME SCREEN */
+  #game-screen { display: none; width: 100%; max-width: 900px; }
+
+  .game-layout {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 680px) {
+    .game-layout {
+      grid-template-columns: 1fr;
+    }
+    .center-col { order: -1; }
+  }
+
+  /* TURN BANNER */
+  .turn-banner {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+  }
+
+  .turn-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .turn-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    transition: color 0.4s;
+  }
+
+  /* CENTER - DECK */
+  .center-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .deck-area {
+    position: relative;
+    width: 140px;
+    height: 200px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .deck-shadow {
+    position: absolute;
+    width: 130px;
+    height: 190px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 10px;
+    top: 6px;
+    left: 6px;
+  }
+
+  .deck-card {
+    position: absolute;
+    width: 130px;
+    height: 190px;
+    background: linear-gradient(135deg, #2a3a5c, #1e2d4a);
+    border: 2px solid rgba(201,168,76,0.4);
+    border-radius: 10px;
+    top: 0; left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+  }
+
+  .deck-area:hover .deck-card {
+    transform: translateY(-4px);
+  }
+
+  .deck-area.empty .deck-card {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  .deck-area.empty:hover .deck-card { transform: none; }
+
+  .deck-pattern {
+    width: 90px;
+    height: 140px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .deck-count {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .deck-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .btn-draw {
+    background: linear-gradient(135deg, #c9a84c, #a8853a);
+    color: #1a1410;
+    border: none;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 10px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-draw:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,168,76,0.3); }
+  .btn-draw:disabled { opacity: 0.35; cursor: default; transform: none; box-shadow: none; }
+
+  .btn-reshuffle {
+    background: none;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold-light);
+    font-family: 'Crimson Text', serif;
+    font-size: 0.95rem;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-reshuffle:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+
+  /* DRAWN CARD DISPLAY */
+  .drawn-card-area {
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .drawn-card {
+    background: var(--card-bg);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 18px 20px;
+    width: 130px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: 'Crimson Text', serif;
+    font-size: 1rem;
+    line-height: 1.4;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    border: 1px solid var(--card-border);
+    animation: cardFlip 0.35s ease-out;
+    position: relative;
+  }
+
+  .drawn-card::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(44,36,22,0.15);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  @keyframes cardFlip {
+    from { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+    to { transform: rotateY(0deg) scale(1); opacity: 1; }
+  }
+
+  .drawn-by {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* PLAYER HANDS */
+  .player-panel {
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 200px;
+  }
+
+  .player-panel h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .player-dot-lg {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .hand-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .hand-card {
+    background: rgba(245,240,232,0.06);
+    border: 1px solid rgba(200,184,154,0.15);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 0.88rem;
+    color: rgba(245,240,232,0.75);
+    font-style: italic;
+    line-height: 1.3;
+  }
+
+  .hand-empty {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+
+  /* ALL PLAYERS - overflow panel */
+  .all-players {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .status-bar {
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    min-height: 1.2em;
+  }
+
+  .highlight { color: var(--gold-light); }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Reshuffle confirm */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(3px);
+  }
+
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    max-width: 320px;
+  }
+
+  .confirm-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+
+  .confirm-box p {
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+  }
+
+  .confirm-btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .btn-danger {
+    background: #8b3a3a;
+    color: #f5e8e8;
+    border: none;
+    font-family: 'Crimson Text', serif;
+    font-size: 1rem;
+    padding: 10px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-danger:hover { background: #a84444; }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--muted);
+    font-family: 'Crimson Text', serif;
+    font-size: 1rem;
+    padding: 10px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--card-bg); }
+</style>
+</head>
+<body>
+
+<h1>The Deck</h1>
+<p class="subtitle">A game of drawing & doing</p>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <h2>Who's playing?</h2>
+    <div id="player-list">
+      <div class="player-entry">
+        <div class="player-dot" style="background:#7eb8d4"></div>
+        <input type="text" placeholder="Player 1 name" value="">
+      </div>
+      <div class="player-entry">
+        <div class="player-dot" style="background:#d47e7e"></div>
+        <input type="text" placeholder="Player 2 name" value="">
+      </div>
+    </div>
+    <button class="btn-add-player" id="btn-add-player" onclick="addPlayer()">+ Add another player</button>
+  </div>
+  <button class="btn-primary" onclick="startGame()">Deal the Deck</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <div class="turn-banner">
+    <div class="turn-label">Current Turn</div>
+    <div class="turn-name" id="turn-name">—</div>
+  </div>
+
+  <div class="game-layout">
+    <!-- Left: first player or "hands" left side -->
+    <div id="left-panel" class="player-panel">
+      <h3><span class="player-dot-lg" id="left-dot"></span><span id="left-name">Player</span></h3>
+      <div class="hand-cards" id="left-hand"></div>
+    </div>
+
+    <!-- Center: Deck -->
+    <div class="center-col">
+      <div class="deck-area" id="deck-area" onclick="drawCard()">
+        <div class="deck-shadow"></div>
+        <div class="deck-card">
+          <div class="deck-pattern">
+            <span class="deck-count" id="deck-count">19</span>
+          </div>
+        </div>
+      </div>
+      <div class="deck-label">cards remaining</div>
+      <div class="drawn-card-area" id="drawn-card-area">
+        <div class="status-bar" id="status-bar">Click the deck to draw</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-draw" id="btn-draw" onclick="drawCard()">Draw Card</button>
+        <button class="btn-reshuffle" onclick="confirmReshuffle()">↺ Reshuffle</button>
+      </div>
+    </div>
+
+    <!-- Right: second player -->
+    <div id="right-panel" class="player-panel">
+      <h3><span class="player-dot-lg" id="right-dot"></span><span id="right-name">Player</span></h3>
+      <div class="hand-cards" id="right-hand"></div>
+    </div>
+  </div>
+
+  <!-- Extra players (3+) shown below -->
+  <div class="all-players" id="extra-players"></div>
+</div>
+
+<!-- Confirm reshuffle overlay -->
+<div class="confirm-overlay" id="confirm-overlay" style="display:none">
+  <div class="confirm-box">
+    <h3>Reshuffle the Deck?</h3>
+    <p>All cards will be returned and the deck shuffled. Everyone's hand will be cleared.</p>
+    <div class="confirm-btn-row">
+      <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-danger" onclick="reshuffle()">Yes, Reshuffle</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CARD DATA ───────────────────────────────────────────────────────────────
+// Edit these 19 cards to match your actual game cards!
+const CARD_TEXTS = [
+  "Take a sip",
+  "Give two sips to anyone",
+  "Everyone drinks",
+  "Make a rule",
+  "Swap hands with another player",
+  "The player to your left drinks",
+  "The player to your right drinks",
+  "Tell an embarrassing story or drink",
+  "Choose someone to finish their drink",
+  "Waterfall — everyone drinks until you stop",
+  "You are immune to the next card drawn against you",
+  "Reverse the turn order",
+  "Skip the next player's turn",
+  "Give out four sips, split however you like",
+  "Ask anyone a question — if they refuse to answer, they drink",
+  "Thumb master — place thumb on table anytime, last person drinks",
+  "No pointing — anyone who points drinks",
+  "Last person to stand up drinks",
+  "Pick a category — first person to fail drinks",
+];
+
+// ─── PLAYER COLORS ───────────────────────────────────────────────────────────
+const COLORS = ['#7eb8d4','#d47e7e','#7ed4a0','#d4c07e','#c47ed4','#d4a07e'];
+
+// ─── GAME STATE ──────────────────────────────────────────────────────────────
+let players = [];
+let deck = [];
+let hands = {};
+let currentPlayerIndex = 0;
+let lastDrawn = null;
+
+// ─── SETUP ───────────────────────────────────────────────────────────────────
+function addPlayer() {
+  const list = document.getElementById('player-list');
+  const count = list.children.length + 1;
+  if (count > 6) return;
+  const color = COLORS[count - 1] || '#aaa';
+  const div = document.createElement('div');
+  div.className = 'player-entry';
+  div.innerHTML = `
+    <div class="player-dot" style="background:${color}"></div>
+    <input type="text" placeholder="Player ${count} name" value="">
+  `;
+  list.appendChild(div);
+  if (count >= 6) document.getElementById('btn-add-player').style.display = 'none';
+}
+
+function startGame() {
+  const inputs = document.querySelectorAll('#player-list input');
+  players = [];
+  inputs.forEach((inp, i) => {
+    const name = inp.value.trim() || `Player ${i + 1}`;
+    players.push({ name, color: COLORS[i] });
+  });
+  if (players.length < 1) return;
+
+  hands = {};
+  players.forEach(p => hands[p.name] = []);
+  currentPlayerIndex = 0;
+  deck = shuffle([...CARD_TEXTS]);
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+
+  renderPlayerPanels();
+  updateUI();
+}
+
+// ─── DECK LOGIC ──────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function drawCard() {
+  if (deck.length === 0) return;
+
+  const card = deck.pop();
+  const player = players[currentPlayerIndex];
+  hands[player.name].push(card);
+  lastDrawn = { card, playerName: player.name };
+
+  // Advance turn
+  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+
+  updateUI();
+}
+
+function reshuffle() {
+  closeConfirm();
+  deck = shuffle([...CARD_TEXTS]);
+  players.forEach(p => hands[p.name] = []);
+  lastDrawn = null;
+  currentPlayerIndex = 0;
+  updateUI();
+  renderHandsOnly();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderPlayerPanels() {
+  // Left panel = player 0
+  document.getElementById('left-dot').style.background = players[0].color;
+  document.getElementById('left-name').textContent = players[0].name;
+
+  // Right panel = player 1 (or same if solo)
+  const rightPlayer = players[1] || players[0];
+  document.getElementById('right-dot').style.background = rightPlayer.color;
+  document.getElementById('right-name').textContent = rightPlayer.name;
+
+  // Extra players (3+)
+  const extra = document.getElementById('extra-players');
+  extra.innerHTML = '';
+  players.slice(2).forEach((p, i) => {
+    const panel = document.createElement('div');
+    panel.className = 'player-panel';
+    panel.id = `extra-panel-${i}`;
+    panel.innerHTML = `
+      <h3><span class="player-dot-lg" style="background:${p.color}"></span>${p.name}</h3>
+      <div class="hand-cards" id="extra-hand-${i}"></div>
+    `;
+    extra.appendChild(panel);
+  });
+}
+
+function renderHandsOnly() {
+  renderHand('left-hand', players[0].name);
+  if (players[1]) renderHand('right-hand', players[1].name);
+  players.slice(2).forEach((p, i) => renderHand(`extra-hand-${i}`, p.name));
+}
+
+function renderHand(containerId, playerName) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const cards = hands[playerName] || [];
+  if (cards.length === 0) {
+    el.innerHTML = '<div class="hand-empty">No cards yet</div>';
+  } else {
+    el.innerHTML = cards.map(c => `<div class="hand-card">${c}</div>`).join('');
+  }
+}
+
+function updateUI() {
+  // Deck count & state
+  const remaining = deck.length;
+  document.getElementById('deck-count').textContent = remaining;
+  const deckArea = document.getElementById('deck-area');
+  deckArea.classList.toggle('empty', remaining === 0);
+  document.getElementById('btn-draw').disabled = remaining === 0;
+
+  // Turn indicator
+  const current = players[currentPlayerIndex];
+  const turnEl = document.getElementById('turn-name');
+  turnEl.textContent = current.name;
+  turnEl.style.color = current.color;
+
+  // Drawn card display
+  const drawnArea = document.getElementById('drawn-card-area');
+  const statusBar = document.getElementById('status-bar');
+
+  if (lastDrawn) {
+    drawnArea.innerHTML = `
+      <div class="drawn-card">${lastDrawn.card}</div>
+      <div class="drawn-by">Drawn by ${lastDrawn.playerName}</div>
+    `;
+  } else if (remaining === 0) {
+    drawnArea.innerHTML = '';
+    statusBar.innerHTML = `<span class="highlight">Deck is empty — reshuffle to play again!</span>`;
+    drawnArea.appendChild(statusBar);
+  } else {
+    drawnArea.innerHTML = '<div class="status-bar" id="status-bar">Click the deck to draw</div>';
+  }
+
+  // Hands
+  renderHandsOnly();
+}
+
+// ─── RESHUFFLE CONFIRM ───────────────────────────────────────────────────────
+function confirmReshuffle() {
+  document.getElementById('confirm-overlay').style.display = 'flex';
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').style.display = 'none';
+}
+
+// Close confirm on overlay click
+document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirm();
+});
+</script>
+</body>
+</html>
