@@ -994,11 +994,15 @@ function renderWaitingRoom() {
   `).join('');
 
   // Can start when all slots are claimed
+  // Can start when all slots are claimed
   const allJoined = players.every(p => p.profileId !== null);
-  btnStart.disabled = !allJoined;
-  document.getElementById('waiting-status').textContent = allJoined
-    ? 'Everyone is here! You can start the game.'
-    : `Waiting for ${players.filter(p => !p.profileId).length} more player(s)…`;
+  const uniqueProfiles = new Set(players.map(p => p.profileId).filter(Boolean));
+  const allDistinct = uniqueProfiles.size === players.length;
+  btnStart.disabled = !(allJoined && allDistinct);
+  document.getElementById('waiting-status').textContent = 
+    !allJoined ? `Waiting for ${players.filter(p => !p.profileId).length} more player(s)…` :
+    !allDistinct ? 'The same player cannot fill multiple seats.' :
+    'Everyone is here! You can start the game.';
 }
 
 async function startGame() {
