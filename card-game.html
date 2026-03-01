@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Deck</title>
+<title>Sniper</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -501,8 +501,8 @@
 </head>
 <body>
 
-<h1>The Deck</h1>
-<p class="subtitle">A game of drawing & doing</p>
+<h1>Sniper</h1>
+<p class="subtitle">A game by Dad and Son</p>
 
 <!-- USER BAR -->
 <div id="user-bar">
@@ -629,6 +629,7 @@
     <p class="success-msg" id="waiting-status"></p>
     <button class="btn-primary" id="btn-start-game" onclick="startGame()" disabled>Start Game</button>
     <button class="btn-secondary" style="margin-top:8px" onclick="copyJoinCode()">Copy Join Code</button>
+    <button class="btn-secondary" id="btn-give-up-seat" onclick="giveUpSeat()" style="margin-top:8px;display:none;border-color:rgba(224,112,112,0.4);color:#e07070">Give Up Seat</button>
   </div>
 </div>
 
@@ -649,10 +650,12 @@
   <div class="game-center">
     <div class="deck-area" id="deck-area" onclick="drawCard()">
       <div class="deck-shadow"></div>
-      <div class="deck-card">
-        <div class="deck-pattern">
-          <span class="deck-count" id="deck-count">19</span>
-          <span class="deck-label">remaining</span>
+      <div class="deck-card" style="padding:0;overflow:hidden;background:none;border:none;">
+        <img src="https://mrghost27.github.io/OurCardGame/card-back.jpg"
+             alt="Card back"
+             style="width:130px;height:190px;object-fit:cover;border-radius:8px;display:block;">
+        <div style="position:absolute;bottom:8px;left:0;right:0;text-align:center;">
+          <span class="deck-count" id="deck-count" style="text-shadow:0 1px 4px rgba(0,0,0,0.8);">19</span>
         </div>
       </div>
     </div>
@@ -697,8 +700,18 @@
     <p>All cards return to the deck and all hands are cleared for everyone.</p>
     <div class="confirm-btn-row">
       <button class="btn-ghost" onclick="closeConfirm()">Cancel</button>
-      <button class="btn-danger" onclick="reshuffle()">Yes, Reshuffle</button>
+      <button class="btn-danger" onclick="showFirstTurnPicker()">Yes, Reshuffle</button>
     </div>
+  </div>
+</div>
+
+<!-- First turn picker — shown after confirming reshuffle -->
+<div class="confirm-overlay" id="first-turn-overlay" style="display:none">
+  <div class="confirm-box">
+    <h3>Who Goes First?</h3>
+    <p>Choose which player takes the first turn after the reshuffle.</p>
+    <div id="first-turn-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+    <button class="btn-ghost" onclick="closeFirstTurnPicker()" style="margin-top:16px;width:100%">Cancel</button>
   </div>
 </div>
 
@@ -712,6 +725,27 @@
       <button class="btn-danger" onclick="endGame()">Yes, End Game</button>
     </div>
   </div>
+</div>
+
+<!-- Eliminate player overlay — shown to other players when Eliminate Player is pressed -->
+<div class="display-overlay" id="eliminate-overlay" style="display:none;z-index:210;">
+  <div class="display-overlay-label" id="eliminate-overlay-label"></div>
+  <div class="display-cards-grid" id="eliminate-cards-grid"></div>
+  <div class="display-overlay-btns">
+    <button class="btn-danger" onclick="concede()">Concede</button>
+    <button class="btn-ghost" onclick="cancelEliminate()">Cancel</button>
+  </div>
+</div>
+
+<!-- Victory screen overlay -->
+<div class="display-overlay" id="victory-overlay" style="display:none;z-index:220;flex-direction:column;gap:24px;">
+  <div style="text-align:center;">
+    <div style="font-family:'Playfair Display',serif;font-size:0.9rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Victory</div>
+    <div style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--gold);" id="victory-winner-name">—</div>
+    <div style="font-style:italic;color:var(--muted);margin-top:4px;">wins the game</div>
+  </div>
+  <div id="victory-all-hands" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:700px;width:100%;"></div>
+  <button class="btn-primary" style="max-width:240px;" onclick="returnToLobby()">Return to Lobby</button>
 </div>
 
 <!-- Display cards overlay — shown to all players when someone displays cards -->
@@ -776,6 +810,9 @@ let realtimeChannel    = null;   // Supabase realtime subscription
 // ── Display cards state ────────────────────────────────────────────────────
 let selectedCardIndices = [];    // indices into myHand that are selected
 let iAmDisplaying       = false; // true if I am the one who triggered display
+
+// ── Elimination state ───────────────────────────────────────────────────────
+let iAmEliminated = false;       // true if this player has conceded
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STARTUP
@@ -930,38 +967,15 @@ async function createGame() {
   gameId   = gameData.id;
   joinCode = code;
 
-  // Host claims slot 0
-  mySlotIndex = 0;
-  players[0].profileId = currentUser.id;
-
-  const { data: gpData, error: gpError } = await db
-    .from('game_players')
-    .insert({
-      game_id:     gameId,
-      profile_id:  currentUser.id,
-      display_name: players[0].name,
-      hand:        [],
-      turn_order:  0,
-    })
-    .select().single();
-
-  if (gpError) { showSyncError(); errEl.textContent = 'Could not join game slot.'; return; }
-
-  myGamePlayerId = gpData.id;
-  myHand = [];
-
-  // Save to localStorage so host can rejoin
-  localStorage.setItem('deck_game_' + currentUser.id, gameId);
-
   showSynced();
 
   // Subscribe to realtime so waiting room updates as others join
   subscribeToGame();
 
-  // Show waiting room
-  document.getElementById('display-join-code').textContent = joinCode;
-  renderWaitingRoom();
-  showScreen('waiting-screen');
+  // Host picks their own slot — same as guests
+  localStorage.setItem('deck_game_' + currentUser.id, gameId);
+  renderSlotPicker(true);  // true = isHost, shows waiting room after claiming
+  showScreen('slot-screen');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1007,6 +1021,29 @@ function copyJoinCode() {
     document.getElementById('waiting-status').textContent = 'Code copied to clipboard!';
     setTimeout(() => renderWaitingRoom(), 2000);
   });
+}
+
+async function giveUpSeat() {
+  if (myGamePlayerId === null) return;
+  showSyncing('Releasing seat…');
+
+  // Remove my game_players row
+  await db.from('game_players').delete().eq('id', myGamePlayerId);
+
+  // Clear my slot from the players array and update the game
+  players[mySlotIndex].profileId = null;
+  await db.from('games').update({ deck: { deck, players, currentPlayerIndex } }).eq('id', gameId);
+
+  mySlotIndex    = null;
+  myGamePlayerId = null;
+  myHand         = [];
+  showSynced();
+
+  // Go back to slot picker so host can pick a different seat
+  document.getElementById('btn-give-up-seat').style.display = 'none';
+  document.getElementById('btn-start-game').style.display = 'none';
+  renderSlotPicker(true);
+  showScreen('slot-screen');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1070,9 +1107,15 @@ async function joinGame() {
   showScreen('slot-screen');
 }
 
-function renderSlotPicker() {
+// isHost = true when the host is picking after creating the room
+let _slotPickerIsHost = false;
+
+function renderSlotPicker(isHost = false) {
+  _slotPickerIsHost = isHost;
   const list  = document.getElementById('slot-list');
-  const taken = players.filter(p => p.profileId !== null).map(p => p.name);
+  // Update heading
+  const heading = document.querySelector('#slot-screen .panel h2');
+  if (heading) heading.textContent = isHost ? 'Claim Your Seat' : 'Who Are You?';
 
   list.innerHTML = players.map((p, i) => {
     const isTaken = p.profileId !== null;
@@ -1120,26 +1163,35 @@ async function claimSlot(slotIndex) {
   myHand         = [];
   players[slotIndex].profileId = currentUser.id;
 
-  // Update the game's player list so host waiting room reflects the join
+  // Update the game's player list so waiting room reflects the join
   await db.from('games').update({
     deck: { deck, players, currentPlayerIndex }
   }).eq('id', gameId);
 
   localStorage.setItem('deck_game_' + currentUser.id, gameId);
   showSynced();
-  subscribeToGame();
+
+  // If subscribeToGame hasn't been called yet (host flow), call it now
+  if (!realtimeChannel) subscribeToGame();
 
   // Check if game already started
   const { data: gameData } = await db.from('games').select('status').eq('id', gameId).single();
-  if (gameData?.status === 'active') { enterGameScreen(); }
-  else {
-    // Wait for host to start — subscribe will handle the transition
+  if (gameData?.status === 'active') { enterGameScreen(); return; }
+
+  // Go to waiting room
+  document.getElementById('display-join-code').textContent = joinCode;
+  const isHost = _slotPickerIsHost;
+
+  // Show/hide host controls
+  document.getElementById('btn-start-game').style.display = isHost ? 'block' : 'none';
+  document.getElementById('btn-give-up-seat').style.display = isHost ? 'block' : 'none';
+
+  if (!isHost) {
     document.getElementById('waiting-status').textContent = `You've joined as ${players[slotIndex].name}. Waiting for the host to start…`;
-    showScreen('waiting-screen');
-    document.getElementById('display-join-code').textContent = joinCode;
-    document.getElementById('btn-start-game').style.display = 'none';
-    renderWaitingRoom();
   }
+
+  renderWaitingRoom();
+  showScreen('waiting-screen');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1187,7 +1239,21 @@ async function rejoinGame(savedGameId) {
 
     subscribeToGame();
 
-    if (gameData.status === 'active') { enterGameScreen(); return true; }
+    // Restore victory state if applicable
+    if (gameData.status === 'victory') {
+      enterGameScreen();
+      await showVictoryScreen();
+      return true;
+    }
+
+    if (gameData.status === 'active') {
+      // Restore eliminated status
+      if (mySlotIndex !== null && players[mySlotIndex]) {
+        iAmEliminated = !!players[mySlotIndex].eliminated;
+      }
+      enterGameScreen();
+      return true;
+    }
 
     // Game still waiting — show waiting room
     document.getElementById('display-join-code').textContent = joinCode;
@@ -1232,35 +1298,57 @@ function subscribeToGame() {
 function handleGameUpdate(payload) {
   const updated = payload.new;
 
-  // ── Stage 5: game was ended by host ───────────────────────────────────────
+  // ── Game ended by host ────────────────────────────────────────────────────
   if (updated.status === 'finished') {
     returnToLobby();
     return;
   }
 
-  // ── Display cards: react to displayed_cards being set or cleared ──────────
+  // ── Victory state — one player left ──────────────────────────────────────
+  if (updated.status === 'victory') {
+    const state = updated.deck;
+    if (state) { deck = state.deck; players = state.players; currentPlayerIndex = state.currentPlayerIndex; }
+    // Re-check my eliminated status from the updated players array
+    if (mySlotIndex !== null && players[mySlotIndex]) {
+      iAmEliminated = !!players[mySlotIndex].eliminated;
+    }
+    // Close any open overlays
+    document.getElementById('display-overlay').style.display = 'none';
+    document.getElementById('eliminate-overlay').style.display = 'none';
+    showVictoryScreen();
+    return;
+  }
+
+  // ── Display cards ─────────────────────────────────────────────────────────
   const displayedCards = updated.displayed_cards;
   const overlay        = document.getElementById('display-overlay');
   const overlayVisible = overlay.style.display !== 'none';
 
   if (displayedCards) {
-    // Cards are being displayed — show overlay to everyone not already seeing it
-    // (the displayer already sees it from their own displaySelectedCards call,
-    //  but re-rendering is safe — it just refreshes the content)
-    if (!iAmDisplaying) {
-      showDisplayOverlay(displayedCards);
+    // Check if this is an elimination challenge
+    if (displayedCards.eliminationChallenge && !iAmDisplaying) {
+      // Show the elimination overlay to non-challengers who aren't eliminated
+      if (!iAmEliminated) {
+        const elimOverlay  = document.getElementById('eliminate-overlay');
+        const elimLabel    = document.getElementById('eliminate-overlay-label');
+        const elimGrid     = document.getElementById('eliminate-cards-grid');
+        elimLabel.innerHTML = `<strong>${displayedCards.challengedBy}</strong> is challenging you to concede:`;
+        elimGrid.innerHTML  = (displayedCards.cards || []).map(c => `<div class="display-card">${c}</div>`).join('');
+        elimOverlay.style.display = 'flex';
+      }
+      // Also refresh the display overlay for the displayer if open
+      if (iAmDisplaying) showDisplayOverlay(displayedCards);
+    } else if (!displayedCards.eliminationChallenge) {
+      // Normal card display
+      if (!iAmDisplaying) showDisplayOverlay(displayedCards);
+      // Close eliminate overlay if it was open
+      document.getElementById('eliminate-overlay').style.display = 'none';
     }
   } else {
-    // displayed_cards was cleared (withdrawn) — close overlay for everyone
-    // but only if it's currently open, to avoid closing something unrelated
-    if (overlayVisible && !iAmDisplaying) {
-      closeDisplayOverlay();
-    }
-    // If I was the displayer and the update comes back, clean up my state
-    if (iAmDisplaying) {
-      iAmDisplaying = false;
-      overlay.style.display = 'none';
-    }
+    // displayed_cards cleared
+    if (overlayVisible && !iAmDisplaying) closeDisplayOverlay();
+    if (iAmDisplaying) { iAmDisplaying = false; overlay.style.display = 'none'; }
+    document.getElementById('eliminate-overlay').style.display = 'none';
   }
 
   // If game just became active, enter game screen
@@ -1275,9 +1363,15 @@ function handleGameUpdate(payload) {
 
   // Update shared state
   const state        = updated.deck;
-  deck               = state.deck;
-  players            = state.players;
-  currentPlayerIndex = state.currentPlayerIndex;
+  if (state) {
+    deck               = state.deck;
+    players            = state.players;
+    currentPlayerIndex = state.currentPlayerIndex;
+    // Restore my eliminated status from updated player data
+    if (mySlotIndex !== null && players[mySlotIndex]) {
+      iAmEliminated = !!players[mySlotIndex].eliminated;
+    }
+  }
 
   // If on waiting screen, refresh it
   if (document.getElementById('waiting-screen').classList.contains('active')) {
@@ -1307,7 +1401,7 @@ function handlePlayerUpdate(payload) {
     // ── Stage 4: update hand count for the player who changed ─────────────
     if (idx !== -1) players[idx].handCount = (row.hand || []).length;
 
-    // ── Stage 5: if it's my row and hand was cleared (reshuffle), update UI
+    // Update my hand from the database (always trust the DB as source of truth)
     if (isMe) {
       myHand = row.hand || [];
       renderMyHand();
@@ -1331,11 +1425,19 @@ function shuffle(arr) {
 async function drawCard() {
   if (deck.length === 0 || isSaving) return;
   if (mySlotIndex !== currentPlayerIndex) return; // not your turn
+  if (iAmEliminated) return; // eliminated players cannot draw
 
   const card = deck.pop();
   myHand.push(card);
   players[mySlotIndex].handCount = myHand.length;
-  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+  // Advance turn, skipping eliminated players
+  let nextIndex = (currentPlayerIndex + 1) % players.length;
+  let safety = 0;
+  while (players[nextIndex]?.eliminated && safety < players.length) {
+    nextIndex = (nextIndex + 1) % players.length;
+    safety++;
+  }
+  currentPlayerIndex = nextIndex;
 
   // Show the drawn card immediately to this player only
   showDrawnCard(card);
@@ -1369,11 +1471,30 @@ async function drawCard() {
   finally { isSaving = false; }
 }
 
-async function reshuffle() {
+function showFirstTurnPicker() {
   closeConfirm();
+  const list = document.getElementById('first-turn-list');
+  list.innerHTML = players
+    .filter(p => !p.eliminated)
+    .map(p => `
+      <button class="btn-secondary" onclick="reshuffle(${players.indexOf(p)})"
+        style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:10px 14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:${p.color};flex-shrink:0;display:inline-block;"></span>
+        ${p.name}
+      </button>
+    `).join('');
+  document.getElementById('first-turn-overlay').style.display = 'flex';
+}
+
+function closeFirstTurnPicker() {
+  document.getElementById('first-turn-overlay').style.display = 'none';
+}
+
+async function reshuffle(firstPlayerIndex = 0) {
+  closeFirstTurnPicker();
   deck               = shuffle([...CARD_TEXTS]);
   myHand             = [];
-  currentPlayerIndex = 0;
+  currentPlayerIndex = firstPlayerIndex;
   players.forEach(p => p.handCount = 0);
 
   updateGameUI();
@@ -1387,7 +1508,7 @@ async function reshuffle() {
     // Reset game state — also clear any displayed cards
     await db.from('games').update({
       deck:                 { deck, players, currentPlayerIndex },
-      current_player_index: 0,
+      current_player_index: firstPlayerIndex,
       displayed_cards:      null,
     }).eq('id', gameId);
 
@@ -1450,16 +1571,19 @@ function updateGameUI() {
   // Player roster chips
   const roster = document.getElementById('player-roster');
   roster.innerHTML = players.map((p, i) => `
-    <div class="roster-chip ${i === currentPlayerIndex ? 'is-turn' : ''} ${i === mySlotIndex ? 'is-me' : ''}">
+    <div class="roster-chip ${i === currentPlayerIndex ? 'is-turn' : ''} ${i === mySlotIndex ? 'is-me' : ''}"
+         style="${p.eliminated ? 'opacity:0.4;text-decoration:line-through;' : ''}">
       <div class="roster-dot" style="background:${p.color}"></div>
       ${p.name}
-      <span class="roster-count">(${p.handCount || 0})</span>
+      ${p.eliminated ? '<span style="font-size:0.72rem;color:var(--red);margin-left:2px;">✕</span>' : `<span class="roster-count">(${p.handCount || 0})</span>`}
     </div>
   `).join('');
 
   // Turn action area
   const actionArea = document.getElementById('turn-action-area');
-  if (remaining === 0) {
+  if (iAmEliminated) {
+    actionArea.innerHTML = `<div class="not-your-turn" style="color:var(--red);">You have been eliminated</div>`;
+  } else if (remaining === 0) {
     actionArea.innerHTML = `<div class="status-bar"><span class="highlight">Deck empty — reshuffle to continue</span></div>`;
   } else if (isMyTurn) {
     actionArea.innerHTML = `<button class="btn-draw" onclick="drawCard()">Draw Card</button>`;
@@ -1568,7 +1692,10 @@ function showDisplayOverlay(data) {
   grid.innerHTML = data.cards.map(c => `<div class="display-card">${c}</div>`).join('');
 
   if (isMe) {
-    btns.innerHTML = `<button class="btn-danger" onclick="withdrawCards()">Withdraw Cards</button>`;
+    btns.innerHTML = `
+      <button class="btn-danger" onclick="withdrawCards()">Withdraw Cards</button>
+      <button class="btn-danger" onclick="initiateEliminate()" style="background:#7a3a8b;">Eliminate Player</button>
+    `;
   } else {
     btns.innerHTML = `<button class="btn-ghost" onclick="dismissCards()">Dismiss</button>`;
   }
@@ -1579,6 +1706,121 @@ function showDisplayOverlay(data) {
 function closeDisplayOverlay() {
   document.getElementById('display-overlay').style.display = 'none';
   iAmDisplaying = false;
+}
+
+// ── ELIMINATE PLAYER ───────────────────────────────────────────────────────
+async function initiateEliminate() {
+  // Write an elimination challenge to Supabase — other players will see it
+  const myName      = players[mySlotIndex]?.name || 'A player';
+  const displayData = JSON.parse(JSON.stringify(  // get current displayed_cards
+    { cards: selectedCardIndices.map(i => myHand[i]) }
+  ));
+
+  // Re-fetch the currently displayed cards from the game state
+  const { data: gameData } = await db.from('games').select('displayed_cards').eq('id', gameId).single();
+  const shownCards = gameData?.displayed_cards?.cards || [];
+
+  await db.from('games').update({
+    displayed_cards: {
+      ...gameData.displayed_cards,
+      eliminationChallenge: true,
+      challengedBy: myName,
+      challengedByProfileId: currentUser.id,
+    }
+  }).eq('id', gameId);
+
+  // Update display overlay to show Eliminate Player is pending
+  const btns = document.getElementById('display-overlay-btns');
+  btns.innerHTML = `
+    <div style="text-align:center;color:var(--muted);font-style:italic;font-size:0.9rem;">
+      Waiting for other players to respond…
+    </div>
+    <button class="btn-ghost" onclick="cancelEliminateAsChallenger()">Cancel Challenge</button>
+  `;
+}
+
+async function cancelEliminateAsChallenger() {
+  // Remove the elimination challenge flag
+  const { data: gameData } = await db.from('games').select('displayed_cards').eq('id', gameId).single();
+  if (gameData?.displayed_cards) {
+    const updated = { ...gameData.displayed_cards };
+    delete updated.eliminationChallenge;
+    delete updated.challengedBy;
+    delete updated.challengedByProfileId;
+    await db.from('games').update({ displayed_cards: updated }).eq('id', gameId);
+  }
+  // Restore normal display overlay buttons
+  const btns = document.getElementById('display-overlay-btns');
+  btns.innerHTML = `
+    <button class="btn-danger" onclick="withdrawCards()">Withdraw Cards</button>
+    <button class="btn-danger" onclick="initiateEliminate()" style="background:#7a3a8b;">Eliminate Player</button>
+  `;
+}
+
+async function concede() {
+  // Mark this player as eliminated in the players array
+  iAmEliminated = true;
+  players[mySlotIndex].eliminated = true;
+
+  document.getElementById('eliminate-overlay').style.display = 'none';
+
+  // Save elimination to game state
+  await db.from('games').update({
+    deck: { deck, players, currentPlayerIndex },
+  }).eq('id', gameId);
+
+  // Update my game_players row to mark eliminated
+  await db.from('game_players').update({ hand: myHand }).eq('id', myGamePlayerId);
+
+  // Check if only one active player remains — if so, trigger victory
+  const activePlayers = players.filter(p => !p.eliminated);
+  if (activePlayers.length === 1) {
+    await db.from('games').update({
+      status: 'victory',
+      displayed_cards: null,
+      deck: { deck, players, currentPlayerIndex },
+    }).eq('id', gameId);
+  }
+
+  updateGameUI();
+}
+
+function cancelEliminate() {
+  document.getElementById('eliminate-overlay').style.display = 'none';
+}
+
+async function showVictoryScreen() {
+  // Fetch all hands from game_players
+  const { data: allRows } = await db.from('game_players').select('*').eq('game_id', gameId);
+  const handsMap = {};
+  if (allRows) allRows.forEach(r => { handsMap[r.display_name] = r.hand || []; });
+
+  const winner = players.find(p => !p.eliminated);
+  document.getElementById('victory-winner-name').textContent = winner?.name || '—';
+
+  const allHandsEl = document.getElementById('victory-all-hands');
+  allHandsEl.innerHTML = players.map(p => `
+    <div style="background:var(--surface);border:1px solid ${p.eliminated ? 'rgba(224,112,112,0.2)' : 'rgba(201,168,76,0.3)'};
+         border-radius:10px;padding:16px;min-width:160px;flex:1;max-width:220px;">
+      <div style="font-family:'Playfair Display',serif;font-size:0.95rem;color:${p.eliminated ? 'var(--muted)' : 'var(--gold-light)'};
+           margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(201,168,76,0.12);
+           display:flex;align-items:center;gap:6px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block;flex-shrink:0;"></span>
+        ${p.name}
+        ${p.eliminated ? '<span style="font-size:0.75rem;color:var(--red);font-style:italic;margin-left:4px;">(eliminated)</span>' : ''}
+      </div>
+      ${(handsMap[p.name] || []).length === 0
+        ? '<div style="color:var(--muted);font-style:italic;font-size:0.85rem;">No cards</div>'
+        : (handsMap[p.name] || []).map(card =>
+            `<div style="background:rgba(245,240,232,0.06);border:1px solid rgba(200,184,154,0.15);
+                  border-radius:4px;padding:6px 8px;font-size:0.85rem;color:rgba(245,240,232,0.8);
+                  font-style:italic;margin-bottom:4px;">${card}</div>`
+          ).join('')
+      }
+    </div>
+  `).join('');
+
+  document.getElementById('victory-overlay').style.display = 'flex';
 }
 
 function showDrawnCard(card) {
@@ -1649,7 +1891,11 @@ function returnToLobby() {
 
   // Close any open overlays
   document.getElementById('display-overlay').style.display = 'none';
+  document.getElementById('eliminate-overlay').style.display = 'none';
+  document.getElementById('victory-overlay').style.display = 'none';
+  document.getElementById('first-turn-overlay').style.display = 'none';
   document.getElementById('game-screen').style.display = 'none';
+  iAmEliminated = false;
   resetPlayerList();
   showScreen('lobby-screen');
 }
