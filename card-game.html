@@ -1309,13 +1309,8 @@ function handlePlayerUpdate(payload) {
 
     // ── Stage 5: if it's my row and hand was cleared (reshuffle), update UI
     if (isMe) {
-      const newHand = row.hand || [];
-      // Only update if the incoming hand differs from what we have locally
-      // (avoids overwriting our hand with a stale broadcast of our own draw)
-      if (newHand.length < myHand.length || newHand.length === 0) {
-        myHand = newHand;
-        renderMyHand();
-      }
+      myHand = row.hand || [];
+      renderMyHand();
     }
 
     updateGameUI();
