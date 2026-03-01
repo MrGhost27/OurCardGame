@@ -1180,15 +1180,20 @@ async function claimSlot(slotIndex) {
 
   // Go to waiting room
   document.getElementById('display-join-code').textContent = joinCode;
-  const isHost = _slotPickerIsHost;
 
-  // Show/hide host controls
+  // Show Start Game and Give Up Seat for whoever created the room (slot 0 creator)
+  // We determine host by whether they created the game (gameId was set by createGame)
+  const isHost = _slotPickerIsHost;
   document.getElementById('btn-start-game').style.display = isHost ? 'block' : 'none';
   document.getElementById('btn-give-up-seat').style.display = isHost ? 'block' : 'none';
 
   if (!isHost) {
     document.getElementById('waiting-status').textContent = `You've joined as ${players[slotIndex].name}. Waiting for the host to start…`;
   }
+
+  // Reset the host flag so if they give up seat and re-pick, it stays correct
+  // but prevent re-entering slot screen from this path
+  _slotPickerIsHost = false;
 
   renderWaitingRoom();
   showScreen('waiting-screen');
