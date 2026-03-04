@@ -1280,7 +1280,7 @@ async function claimSeat(slotIndex) {
 
   await db.from('games').update({ deck: { deck, players, currentPlayerIndex } }).eq('id', gameId);
   showSynced();
-  renderWaitingRoom();
+  await renderWaitingRoom();
 }
 
 async function releaseSeat() {
@@ -1301,7 +1301,7 @@ async function releaseSeat() {
 
   await db.from('games').update({ deck: { deck, players, currentPlayerIndex } }).eq('id', gameId);
   showSynced();
-  renderWaitingRoom();
+  await renderWaitingRoom();
 }
 
 async function releaseSeatSilent() {
