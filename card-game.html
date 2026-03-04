@@ -1407,7 +1407,10 @@ async function rejoinGame(savedGameId) {
     subscribeToGame();
 
     if (gameData.status === 'victory') { enterGameScreen(); await showVictoryScreen(); return true; }
-    if (gameData.status === 'active')  { enterGameScreen(); return true; }
+    if (gameData.status === 'active')  {
+      enterGameScreen();
+      setTimeout(refreshAllHandCounts, 600);
+      return true; }
 
     // Still waiting
     isHostSession = false; // we don't know if we're host on rejoin, default to guest view
@@ -1636,6 +1639,22 @@ async function enterGameScreen() {
   updateGameUI();
   renderMyHand();
   if (iAmObserver) renderObserverHands();
+}
+
+async function refreshAllHandCounts() {
+  try {
+    const { data: allRows } = await db
+      .from('game_players').select('display_name, hand, is_observer').eq('game_id', gameId);
+    if (allRows) {
+      allRows.forEach(row => {
+        if (row.is_observer) return;
+        const idx = players.findIndex(p => p.name === row.display_name);
+        if (idx !== -1) players[idx].handCount = (row.hand || []).length;
+      });
+      updateGameUI();
+      if (iAmObserver) renderObserverHands();
+    }
+  } catch(e) { /* non-critical */ }
 }
 
 function updateGameUI() {
