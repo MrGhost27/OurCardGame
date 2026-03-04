@@ -1071,6 +1071,7 @@ async function createGame() {
   joinCode = code;
   isHostSession = true;
   localStorage.setItem('deck_game_' + currentUser.id, gameId);
+  localStorage.setItem('deck_host_' + gameId, '1');
   showSynced();
   subscribeToGame();
   openWaitingRoom();
@@ -1100,7 +1101,7 @@ async function joinGame() {
   deck               = state.deck;
   players            = state.players;
   currentPlayerIndex = state.currentPlayerIndex;
-  isHostSession      = false;
+  isHostSession = localStorage.getItem('deck_host_' + data.id) === '1';
 
   // Check if already in this game
   const { data: gpRows } = await db.from('game_players').select('*').eq('game_id', gameId);
@@ -1399,6 +1400,9 @@ async function rejoinGame(savedGameId) {
     iAmObserver    = !!myRow.is_observer;
     mySlotIndex    = iAmObserver ? null : myRow.turn_order;
     if (mySlotIndex !== null && players[mySlotIndex]) iAmEliminated = !!players[mySlotIndex].eliminated;
+
+    // Restore host status from localStorage
+    isHostSession = localStorage.getItem('deck_host_' + savedGameId) === '1';
 
     subscribeToGame();
 
@@ -1900,6 +1904,7 @@ function resetAllState() {
 function returnToLobby() {
   if (realtimeChannel) { db.removeChannel(realtimeChannel); realtimeChannel = null; }
   localStorage.removeItem('deck_game_' + currentUser?.id);
+  if (gameId) localStorage.removeItem('deck_host_' + gameId);
   const prevUser    = currentUser;
   const prevProfile = currentProfile;
   resetAllState();
