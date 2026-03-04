@@ -1235,24 +1235,37 @@ async function renderWaitingRoom() {
 
 async function claimSeat(slotIndex) {
   document.getElementById('waiting-error').textContent = '';
-
-  // Release any existing seat or observer slot first
-  if (myGamePlayerId) await releaseSeatSilent();
-
   showSyncing('Claiming seat…');
 
-  // Double-check not already taken
+  // Step 1: Delete ALL existing rows for this user in this game (belt-and-braces)
+  const { error: delErr } = await db
+    .from('game_players')
+    .delete()
+    .eq('game_id', gameId)
+    .eq('profile_id', currentUser.id);
+
+  if (delErr) { showSyncError(); document.getElementById('waiting-error').textContent = 'Could not release previous seat.'; return; }
+
+  // Reset local state after delete
+  if (mySlotIndex !== null) players[mySlotIndex].profileId = null;
+  myGamePlayerId = null;
+  mySlotIndex    = null;
+  iAmObserver    = false;
+  myHand         = [];
+
+  // Step 2: Verify the target seat is still free
   const { data: existing } = await db
     .from('game_players').select('id')
     .eq('game_id', gameId).eq('display_name', players[slotIndex].name).single();
 
   if (existing) {
     showSyncError();
-    document.getElementById('waiting-error').textContent = 'That seat was just taken.';
+    document.getElementById('waiting-error').textContent = 'That seat was just taken by someone else.';
     renderWaitingRoom();
     return;
   }
 
+  // Step 3: Insert new row
   const { data: gpData, error } = await db
     .from('game_players')
     .insert({ game_id: gameId, profile_id: currentUser.id, display_name: players[slotIndex].name, hand: [], turn_order: slotIndex, is_observer: false })
@@ -1265,22 +1278,35 @@ async function claimSeat(slotIndex) {
   iAmObserver    = false;
   players[slotIndex].profileId = currentUser.id;
 
-  // Push updated player list to game
   await db.from('games').update({ deck: { deck, players, currentPlayerIndex } }).eq('id', gameId);
   showSynced();
   renderWaitingRoom();
 }
 
 async function releaseSeat() {
-  await releaseSeatSilent();
+  showSyncing('Releasing…');
+  const { error } = await db
+    .from('game_players')
+    .delete()
+    .eq('game_id', gameId)
+    .eq('profile_id', currentUser.id);
+
+  if (error) { showSyncError(); return; }
+
+  if (mySlotIndex !== null) players[mySlotIndex].profileId = null;
+  myGamePlayerId = null;
+  mySlotIndex    = null;
+  iAmObserver    = false;
+  myHand         = [];
+
+  await db.from('games').update({ deck: { deck, players, currentPlayerIndex } }).eq('id', gameId);
   showSynced();
   renderWaitingRoom();
 }
 
 async function releaseSeatSilent() {
-  if (!myGamePlayerId) return;
-  showSyncing('Releasing…');
-  await db.from('game_players').delete().eq('id', myGamePlayerId);
+  if (!myGamePlayerId && !iAmObserver) return;
+  await db.from('game_players').delete().eq('game_id', gameId).eq('profile_id', currentUser.id);
   if (mySlotIndex !== null) players[mySlotIndex].profileId = null;
   await db.from('games').update({ deck: { deck, players, currentPlayerIndex } }).eq('id', gameId);
   myGamePlayerId = null;
