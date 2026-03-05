@@ -1062,7 +1062,7 @@ async function createGame() {
   showSyncing('Creating room…');
   const { data: gameData, error: gameError } = await db
     .from('games')
-    .insert({ join_code: code, deck: { deck, players, currentPlayerIndex }, current_player_index: 0, status: 'waiting' })
+    .insert({ join_code: code, deck: { deck, players, currentPlayerIndex }, current_player_index: 0, status: 'waiting', host_id: currentUser.id })
     .select().single();
 
   if (gameError) { showSyncError(); errEl.textContent = 'Could not create game. Try again.'; return; }
@@ -1101,7 +1101,9 @@ async function joinGame() {
   deck               = state.deck;
   players            = state.players;
   currentPlayerIndex = state.currentPlayerIndex;
-  isHostSession = localStorage.getItem('deck_host_' + data.id) === '1';
+  // DB host_id is authoritative; localStorage is a fast fallback
+  isHostSession = (data.host_id === currentUser.id) ||
+                  (localStorage.getItem('deck_host_' + data.id) === '1');
 
   // Check if already in this game
   const { data: gpRows } = await db.from('game_players').select('*').eq('game_id', gameId);
@@ -1142,6 +1144,18 @@ function openWaitingRoom() {
 }
 
 async function renderWaitingRoom() {
+  // Fetch game row to get authoritative host_id
+  const { data: gameRow } = await db.from('games').select('host_id').eq('id', gameId).single();
+  if (gameRow?.host_id) {
+    isHostSession = gameRow.host_id === currentUser.id;
+    // Keep localStorage in sync as a fast hint for next load
+    if (isHostSession) localStorage.setItem('deck_host_' + gameId, '1');
+  }
+  // Always reflect current host status on Start button
+  document.getElementById('btn-start-game').style.display = isHostSession ? 'block' : 'none';
+  document.getElementById('waiting-title').textContent =
+    isHostSession ? 'Waiting for Players' : 'Joined — Waiting to Start';
+
   // Fetch fresh game_players to know who's in what seat
   const { data: gpRows } = await db.from('game_players').select('*').eq('game_id', gameId);
   const occupants = gpRows || [];
@@ -1401,8 +1415,9 @@ async function rejoinGame(savedGameId) {
     mySlotIndex    = iAmObserver ? null : myRow.turn_order;
     if (mySlotIndex !== null && players[mySlotIndex]) iAmEliminated = !!players[mySlotIndex].eliminated;
 
-    // Restore host status from localStorage
-    isHostSession = localStorage.getItem('deck_host_' + savedGameId) === '1';
+    // Restore host status — DB host_id is authoritative, localStorage is fallback
+    isHostSession = (gameData.host_id === currentUser.id) ||
+                    (localStorage.getItem('deck_host_' + savedGameId) === '1');
 
     subscribeToGame();
 
@@ -1412,8 +1427,7 @@ async function rejoinGame(savedGameId) {
       setTimeout(refreshAllHandCounts, 600);
       return true; }
 
-    // Still waiting
-    isHostSession = false; // we don't know if we're host on rejoin, default to guest view
+    // Still waiting — renderWaitingRoom will re-check host_id from DB
     openWaitingRoom();
     return true;
 
