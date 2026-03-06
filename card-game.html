@@ -1497,8 +1497,17 @@ function handleGameUpdate(payload) {
 
   const state = updated.deck;
   if (state) {
+    const prevDeckLength = deck.length;
     deck = state.deck; players = state.players; currentPlayerIndex = state.currentPlayerIndex;
     if (mySlotIndex !== null && players[mySlotIndex]) iAmEliminated = !!players[mySlotIndex].eliminated;
+
+    // If all player hand counts dropped to zero, this is a reshuffle — clear local hand
+    const allHandsEmpty = players.every(p => (p.handCount || 0) === 0);
+    if (allHandsEmpty && myHand.length > 0) {
+      myHand = [];
+      renderMyHand();
+      clearDrawnCard();
+    }
   }
 
   if (document.getElementById('waiting-screen').classList.contains('active')) {
@@ -1517,7 +1526,10 @@ function handlePlayerUpdate(payload) {
     const idx  = players.findIndex(p => p.name === row.display_name);
     const isMe = row.profile_id === currentUser.id;
     if (idx !== -1) players[idx].handCount = (row.hand||[]).length;
-    if (isMe) { myHand = row.hand || []; renderMyHand(); }
+    if (isMe) {
+      myHand = row.hand || [];
+      renderMyHand();
+    }
     // If observer, refresh all visible hands
     if (iAmObserver) renderObserverHands();
     updateGameUI();
