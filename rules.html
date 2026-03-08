@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sniper — Rules</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1410;
+    --surface: #242018;
+    --surface2: #2e2820;
+    --surface3: #342e24;
+    --card-bg: #f5f0e8;
+    --card-border: #c8b89a;
+    --ink: #2c2416;
+    --gold: #c9a84c;
+    --gold-light: #e8d08a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --muted: #6b5d4a;
+    --green: #7ed4a0;
+    --red: #e07070;
+    --blue: #7eb8d4;
+    --purple: #c47ed4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--card-bg);
+    font-family: 'Crimson Text', Georgia, serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 15% 20%, rgba(201,168,76,0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 70%, rgba(201,168,76,0.03) 0%, transparent 50%);
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────────────────── */
+  .site-header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .header-sub {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    padding: 6px 14px;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .back-link:hover { color: var(--gold-light); border-color: rgba(201,168,76,0.4); }
+
+  /* ── NAV ─────────────────────────────────────────────────────────────── */
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    position: sticky;
+    top: 0;
+    background: rgba(26,20,16,0.96);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+
+  .toc a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--gold-light); border-color: rgba(201,168,76,0.25); }
+
+  /* ── MAIN LAYOUT ─────────────────────────────────────────────────────── */
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── SECTIONS ────────────────────────────────────────────────────────── */
+  .section {
+    margin-bottom: 64px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.2s; }
+  .section:nth-child(5) { animation-delay: 0.25s; }
+  .section:nth-child(6) { animation-delay: 0.3s; }
+  .section:nth-child(7) { animation-delay: 0.35s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.03em;
+  }
+
+  .section-number {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  p {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: rgba(245,240,232,0.85);
+    margin-bottom: 14px;
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  /* ── CARD GRID ───────────────────────────────────────────────────────── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .game-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 16px 14px;
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .game-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .game-card::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border: 1px solid rgba(44,36,22,0.12);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .game-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .game-card-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: rgba(44,36,22,0.75);
+    font-style: italic;
+  }
+
+  .game-card-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-top: 8px;
+    font-style: normal;
+    font-family: 'Crimson Text', serif;
+    font-weight: 600;
+  }
+
+  .tag-attack  { background: rgba(224,112,112,0.15); color: #c04040; border: 1px solid rgba(224,112,112,0.3); }
+  .tag-defence { background: rgba(126,212,160,0.15); color: #3a9060; border: 1px solid rgba(126,212,160,0.3); }
+  .tag-find    { background: rgba(201,168,76,0.15);  color: #8a6a20; border: 1px solid rgba(201,168,76,0.3); }
+  .tag-move    { background: rgba(126,184,212,0.15); color: #3070a0; border: 1px solid rgba(126,184,212,0.3); }
+  .tag-heal    { background: rgba(196,126,212,0.15); color: #803090; border: 1px solid rgba(196,126,212,0.3); }
+  .tag-blank   { background: rgba(107,93,74,0.15);   color: #6b5d4a; border: 1px solid rgba(107,93,74,0.3); }
+
+  /* ── SCENARIO BOXES ──────────────────────────────────────────────────── */
+  .scenario {
+    background: var(--surface);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin: 16px 0;
+    position: relative;
+  }
+
+  .scenario-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--gold-light);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .scenario-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    color: rgba(245,240,232,0.8);
+  }
+
+  .step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-card {
+    display: inline-block;
+    background: var(--card-bg);
+    color: var(--ink);
+    font-style: italic;
+    font-size: 0.88rem;
+    padding: 1px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--card-border);
+    white-space: nowrap;
+  }
+
+  .arrow {
+    color: var(--muted);
+    margin: 0 3px;
+  }
+
+  /* ── HEALTH TRACK ────────────────────────────────────────────────────── */
+  .health-track {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+
+  .health-state {
+    flex: 1;
+    min-width: 180px;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid rgba(201,168,76,0.12);
+    text-align: center;
+  }
+
+  .health-pips {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .pip {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,168,76,0.3);
+  }
+  .pip.full { background: var(--green); border-color: var(--green); }
+  .pip.wound { background: var(--red); border-color: var(--red); }
+  .pip.empty { background: transparent; }
+
+  .health-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+  }
+
+  .health-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── RULE CALLOUT ────────────────────────────────────────────────────── */
+  .callout {
+    border-left: 3px solid var(--gold);
+    background: rgba(201,168,76,0.05);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: rgba(245,240,232,0.8);
+  }
+
+  .callout.red   { border-color: var(--red);   background: rgba(224,112,112,0.05); }
+  .callout.green { border-color: var(--green); background: rgba(126,212,160,0.05); }
+  .callout.blue  { border-color: var(--blue);  background: rgba(126,184,212,0.05); }
+
+  .callout strong { color: var(--gold-light); }
+  .callout.red strong   { color: #e8a0a0; }
+  .callout.green strong { color: #a0d8b8; }
+  .callout.blue strong  { color: #a0c8e0; }
+
+  /* ── FLOW DIAGRAM ────────────────────────────────────────────────────── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+
+  .flow-node {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .flow-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .flow-connector {
+    width: 2px;
+    flex: 1;
+    background: rgba(201,168,76,0.2);
+    min-height: 16px;
+  }
+
+  .flow-content {
+    flex: 1;
+    padding: 4px 0 20px 8px;
+  }
+
+  .flow-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+  }
+
+  .flow-detail {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* ── DIVIDER ─────────────────────────────────────────────────────────── */
+  .ornament {
+    text-align: center;
+    color: rgba(201,168,76,0.3);
+    font-size: 1.2rem;
+    letter-spacing: 0.5em;
+    margin: 48px 0 0;
+    user-select: none;
+  }
+
+  /* ── FOOTER ──────────────────────────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 32px 24px;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  footer a { color: var(--gold); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
+    .health-track { flex-direction: column; }
+    .toc { gap: 6px; }
+    .toc a { font-size: 0.72rem; padding: 4px 9px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-eyebrow">Field Manual</div>
+  <h1>Sniper</h1>
+  <p class="header-sub">A game by Dad and Son</p>
+  <a href="index.html" class="back-link">← Play the Game</a>
+</header>
+
+<nav class="toc">
+  <a href="#overview">Overview</a>
+  <a href="#turn">Taking a Turn</a>
+  <a href="#finding">Finding an Enemy</a>
+  <a href="#attacking">Attacking</a>
+  <a href="#defending">Defending</a>
+  <a href="#health">Health</a>
+  <a href="#cards">All Cards</a>
+  <a href="#reshuffle">Reshuffle</a>
+</nav>
+
+<main class="content">
+
+  <!-- ═══ OVERVIEW ═══ -->
+  <section class="section" id="overview">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div>
+        <div class="section-number">Section 01</div>
+        <h2 class="section-title">Overview</h2>
+      </div>
+    </div>
+    <p>Sniper is a tactical card game for 2 or more players. Each player is a sniper operating in the field, drawing cards from a shared deck and using them to locate, attack, and eliminate their opponents.</p>
+    <p>Cards are held privately in hand and revealed only when played. The last player standing wins.</p>
+    <div class="callout">
+      <strong>The golden rule:</strong> You cannot attack an enemy you haven't found. Before any attack, you must first establish that you know where your target is.
+    </div>
+  </section>
+
+  <!-- ═══ TURN ═══ -->
+  <section class="section" id="turn">
+    <div class="section-header">
+      <div class="section-icon">🃏</div>
+      <div>
+        <div class="section-number">Section 02</div>
+        <h2 class="section-title">Taking a Turn</h2>
+      </div>
+    </div>
+    <p>On your turn, draw one card from the top of the deck. It is added to your hand privately — other players cannot see what you drew.</p>
+    <p>You may then choose to play cards from your hand. Playing a card means displaying it to all other players using the Display Cards feature. Cards are played in response to situations or to initiate an attack — there is no fixed "play phase".</p>
+    <div class="callout blue">
+      <strong>Holding cards:</strong> You are never forced to play a card immediately after drawing it. Cards can be saved in hand and played at any time, including during another player's turn in response to an attack.
+    </div>
+    <p>After drawing, play passes to the next player in the turn order shown at the top of the screen.</p>
+  </section>
+
+  <!-- ═══ FINDING ═══ -->
+  <section class="section" id="finding">
+    <div class="section-header">
+      <div class="section-icon">🔭</div>
+      <div>
+        <div class="section-number">Section 03</div>
+        <h2 class="section-title">Finding an Enemy</h2>
+      </div>
+    </div>
+    <p>Before attacking a player, you must establish their location using a <strong>Found</strong> card or a successful <strong>High Ground</strong> roll. Announce which player you are targeting when you play a Found card.</p>
+
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+      <div class="game-card">
+        <div class="game-card-name">Found him: Head</div>
+        <div class="game-card-desc">You have eyes on the target's position. Enables attacks this turn.</div>
+        <span class="game-card-tag tag-find">Found</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Found him: Body</div>
+        <div class="game-card-desc">You have eyes on the target's position. Enables attacks this turn.</div>
+        <span class="game-card-tag tag-find">Found</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">High Ground: Spotting 8+ (D12)</div>
+        <div class="game-card-desc">Roll a D12. On an 8 or higher, you spot the target — counts as a Found card. On a 7 or lower, nothing happens.</div>
+        <span class="game-card-tag tag-find">Found (on success)</span>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>High Ground tip:</strong> You may play High Ground on its own first to test whether you find your target before committing further cards to an attack.
+    </div>
+
+    <p>Once a Found card (or successful High Ground) has been played, you may immediately follow it with attack cards in the same display action, or display them separately.</p>
+  </section>
+
+  <!-- ═══ ATTACKING ═══ -->
+  <section class="section" id="attacking">
+    <div class="section-header">
+      <div class="section-icon">💥</div>
+      <div>
+        <div class="section-number">Section 04</div>
+        <h2 class="section-title">Attacking</h2>
+      </div>
+    </div>
+
+    <p>Once a target is found, you may play one of the following attack cards against them. Display the cards to all players — the target then has the opportunity to respond.</p>
+
+    <div class="scenario">
+      <div class="scenario-title">⚔️ Standard Attack Sequence</div>
+      <div class="scenario-steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>Display <span class="step-card">Found him: Head</span> or <span class="step-card">Found him: Body</span> — announce your target</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>Display your attack card: <span class="step-card">Hit</span>, <span class="step-card">Hit the target</span>, or <span class="step-card">Grenade</span></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>The target may respond with a defence card (see Defending)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>If the attack lands, apply the result based on where the target was found (head or body)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="game-card">
+        <div class="game-card-name">Hit</div>
+        <div class="game-card-desc">A successful shot lands on the target. The effect depends on whether they were found by Head or Body.</div>
+        <span class="game-card-tag tag-attack">Attack</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Hit the target</div>
+        <div class="game-card-desc">A successful shot lands on the target. The effect depends on whether they were found by Head or Body.</div>
+        <span class="game-card-tag tag-attack">Attack</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Grenade: relocate in 2 or explode</div>
+        <div class="game-card-desc">The target must play a Relocate card within 2 turns or take a wound. The countdown begins immediately when played.</div>
+        <span class="game-card-tag tag-attack">Attack</span>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <strong>Headshot:</strong> If the target was found using <em>Found him: Head</em>, a successful hit is an instant elimination — regardless of their current health.
+      <br><br>
+      <strong>Body shot:</strong> If the target was found using <em>Found him: Body</em>, a successful hit inflicts a <em>Wound</em>. A second wound eliminates the player.
+    </div>
+  </section>
+
+  <!-- ═══ DEFENDING ═══ -->
+  <section class="section" id="defending">
+    <div class="section-header">
+      <div class="section-icon">🛡️</div>
+      <div>
+        <div class="section-number">Section 05</div>
+        <h2 class="section-title">Defending &amp; Counter-Attacking</h2>
+      </div>
+    </div>
+
+    <p>When you are attacked, you have a window to respond before the attack resolves. Responses are played by displaying cards from your hand.</p>
+
+    <div class="card-grid">
+      <div class="game-card">
+        <div class="game-card-name">Decoy</div>
+        <div class="game-card-desc">Play in response to any attack. The attack misses entirely — nothing happens to you.</div>
+        <span class="game-card-tag tag-defence">Defence</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Decoy deployed</div>
+        <div class="game-card-desc">Play in response to any attack. The attack misses entirely — nothing happens to you.</div>
+        <span class="game-card-tag tag-defence">Defence</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Relocate</div>
+        <div class="game-card-desc">Play in response to a Grenade to cancel its effect. Must be played within 2 turns of the Grenade being played.</div>
+        <span class="game-card-tag tag-move">Move</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Counter Snipe: 4+ (D6)</div>
+        <div class="game-card-desc">If you deflected an attack with a Decoy, you may shoot back. Roll a D6 — on a 4 or higher, the counter-attack lands as a headshot: instant elimination.</div>
+        <span class="game-card-tag tag-attack">Counter</span>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-title">🔄 Counter-Attack Sequence</div>
+      <div class="scenario-steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>You are attacked and play <span class="step-card">Decoy</span> — the attack misses</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>If you hold <span class="step-card">Counter Snipe</span>, you may now display it and roll a D6</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>On a <strong>4 or higher</strong> — the counter-attack is a <strong>headshot</strong>. The original attacker is instantly eliminated, regardless of their health</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>The attacker may play <span class="step-card">Decoy</span> or <span class="step-card">Decoy deployed</span> to cancel the counter-attack</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div>On a <strong>3 or lower</strong>, or if the attacker plays a Decoy — the counter misses</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout green" style="border-color:#c47ed4;background:rgba(196,126,212,0.06);">
+      <strong style="color:#d4a8e0;">⭐ The hole in one:</strong> A successful Counter Snipe is the rarest and most celebrated play in the game. Not only did you survive an attack, you turned it into an instant elimination. Difficult to pull off — a Decoy card stops it entirely — but devastating when it lands.
+    </div>
+
+    <div class="callout green">
+      <strong>Grenade &amp; Relocate:</strong> A Grenade starts counting down the moment it is played. The targeted player has 2 turns (their own turns) to display a <em>Relocate</em> card. If they do, the Grenade fizzles. If the 2 turns pass without a Relocate being played, the player takes a wound.
+    </div>
+  </section>
+
+  <!-- ═══ HEALTH ═══ -->
+  <section class="section" id="health">
+    <div class="section-header">
+      <div class="section-icon">❤️</div>
+      <div>
+        <div class="section-number">Section 06</div>
+        <h2 class="section-title">Health &amp; Elimination</h2>
+      </div>
+    </div>
+
+    <p>Each player has two health points. Health is currently tracked by the players themselves — keep track of your own wounds.</p>
+
+    <div class="health-track">
+      <div class="health-state">
+        <div class="health-pips">
+          <div class="pip full"></div>
+          <div class="pip full"></div>
+        </div>
+        <div class="health-label">Healthy</div>
+        <div class="health-desc">Full health. Can take one wound before becoming critical.</div>
+      </div>
+      <div class="health-state">
+        <div class="health-pips">
+          <div class="pip wound"></div>
+          <div class="pip empty"></div>
+        </div>
+        <div class="health-label">Wounded</div>
+        <div class="health-desc">One wound taken. A second wound or a headshot will eliminate you.</div>
+      </div>
+      <div class="health-state" style="border-color:rgba(224,112,112,0.25);">
+        <div class="health-pips">
+          <div class="pip wound"></div>
+          <div class="pip wound"></div>
+        </div>
+        <div class="health-label" style="color:#e8a0a0;">Eliminated</div>
+        <div class="health-desc">Two wounds, or one headshot. You remain in the game as an observer.</div>
+      </div>
+    </div>
+
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 8px;">
+      <div class="game-card">
+        <div class="game-card-name">Bandage</div>
+        <div class="game-card-desc">Play at any time to remove your Wounded status. You return to full health.</div>
+        <span class="game-card-tag tag-heal">Heal</span>
+      </div>
+    </div>
+
+    <div class="callout red">
+      <strong>Headshot:</strong> An attack using <em>Found him: Head</em> + a Hit card is an instant elimination, regardless of current health. There is no defence beyond a Decoy card.
+    </div>
+
+    <p>An eliminated player remains in the game as a spectator. They can see all displayed cards and watch the game continue, but cannot draw cards or take actions. Their turns are skipped automatically.</p>
+
+    <p>When only one player remains uneliminated, that player wins.</p>
+  </section>
+
+  <!-- ═══ ALL CARDS ═══ -->
+  <section class="section" id="cards">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div>
+        <div class="section-number">Section 07</div>
+        <h2 class="section-title">Full Card List</h2>
+      </div>
+    </div>
+
+    <p>The deck contains 19 cards. Multiple copies of similar cards exist — for example, there are several blank cards and two Found cards.</p>
+
+    <div class="card-grid">
+      <div class="game-card">
+        <div class="game-card-name">Found him: Head</div>
+        <div class="game-card-desc">Spots target at head position. Enables a headshot (instant elimination).</div>
+        <span class="game-card-tag tag-find">Find</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Found him: Body</div>
+        <div class="game-card-desc">Spots target at body position. Enables a body shot (wound).</div>
+        <span class="game-card-tag tag-find">Find</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">High Ground: Spotting 8+ (D12)</div>
+        <div class="game-card-desc">Roll D12. On 8+, counts as a Found card of your choice.</div>
+        <span class="game-card-tag tag-find">Find</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Hit</div>
+        <div class="game-card-desc">Attack card. Resolves against a found target.</div>
+        <span class="game-card-tag tag-attack">Attack</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Hit the target</div>
+        <div class="game-card-desc">Attack card. Resolves against a found target.</div>
+        <span class="game-card-tag tag-attack">Attack</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Counter Snipe: 4+ (D6)</div>
+        <div class="game-card-desc">After surviving an attack with Decoy, roll D6. On 4+, land a headshot on the attacker — instant elimination.</div>
+        <span class="game-card-tag tag-attack">Counter</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Grenade: relocate in 2 or explode</div>
+        <div class="game-card-desc">Target has 2 turns to play Relocate or takes a wound.</div>
+        <span class="game-card-tag tag-attack">Attack</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Decoy</div>
+        <div class="game-card-desc">Cancel any incoming attack. Also stops a Counter Snipe.</div>
+        <span class="game-card-tag tag-defence">Defence</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Decoy deployed</div>
+        <div class="game-card-desc">Cancel any incoming attack. Also stops a Counter Snipe.</div>
+        <span class="game-card-tag tag-defence">Defence</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Bandage</div>
+        <div class="game-card-desc">Remove your Wounded status. Return to full health.</div>
+        <span class="game-card-tag tag-heal">Heal</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Relocate</div>
+        <div class="game-card-desc">Cancel a Grenade by moving position before it detonates.</div>
+        <span class="game-card-tag tag-move">Move</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Snipers relocate</div>
+        <div class="game-card-desc">All players must relocate — any active Found cards are cancelled.</div>
+        <span class="game-card-tag tag-move">Move</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Nothing</div>
+        <div class="game-card-desc">No effect. Drawn and held — or discarded if no hand play is made.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">No target</div>
+        <div class="game-card-desc">No effect.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Miss</div>
+        <div class="game-card-desc">No effect.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Missed shot</div>
+        <div class="game-card-desc">No effect.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Nothing there</div>
+        <div class="game-card-desc">No effect.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">No thing</div>
+        <div class="game-card-desc">No effect.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+      <div class="game-card">
+        <div class="game-card-name">Not a target</div>
+        <div class="game-card-desc">No effect.</div>
+        <span class="game-card-tag tag-blank">Blank</span>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Blank cards:</strong> The deck contains many blank cards by design. Drawing them builds tension and uncertainty — you never know what an opponent is holding. A player with a full hand of blanks must bluff or wait.
+    </div>
+  </section>
+
+  <!-- ═══ RESHUFFLE ═══ -->
+  <section class="section" id="reshuffle">
+    <div class="section-header">
+      <div class="section-icon">🔄</div>
+      <div>
+        <div class="section-number">Section 08</div>
+        <h2 class="section-title">Reshuffle</h2>
+      </div>
+    </div>
+
+    <p>After any attack sequence has been fully resolved — whether the attack landed, was deflected, or a counter-attack played out — if two or more players remain uneliminated, the deck is reshuffled.</p>
+
+    <div class="flow">
+      <div class="flow-node">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <div class="flow-label">Attack resolves</div>
+          <div class="flow-detail">Hit, Grenade, Counter Snipe, or all defences exhausted</div>
+        </div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <div class="flow-label">Check player count</div>
+          <div class="flow-detail">If only one player remains uneliminated — that player wins</div>
+        </div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-line"><div class="flow-dot"></div><div class="flow-connector"></div></div>
+        <div class="flow-content">
+          <div class="flow-label">Reshuffle the deck</div>
+          <div class="flow-detail">All cards return to the deck. All hands are cleared. A new first player is chosen</div>
+        </div>
+      </div>
+      <div class="flow-node">
+        <div class="flow-line"><div class="flow-dot"></div></div>
+        <div class="flow-content">
+          <div class="flow-label">Play continues</div>
+          <div class="flow-detail">The chosen player draws first from the fresh deck</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <strong>Manual reshuffle:</strong> The host can also trigger a reshuffle at any time using the Reshuffle All button if all players agree — for example if the deck runs empty before an attack is completed.
+    </div>
+  </section>
+
+  <div class="ornament">· · ·</div>
+
+</main>
+
+<footer>
+  <p>Sniper — <em>A game by Dad and Son</em> &nbsp;·&nbsp; <a href="index.html">Play now →</a></p>
+</footer>
+
+</body>
+</html>
